@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GAME_HEIGHT, GAME_WIDTH } from '../core/constants';
+import type { Player } from '../entities/player';
 
 export class RenderSystem {
     private canvas: HTMLDivElement;
@@ -13,6 +14,8 @@ export class RenderSystem {
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, GAME_WIDTH / GAME_HEIGHT, 0.1, 1000);
+        // Position the camera so we can see the scene
+        this.camera.position.set(0, 2, 2);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
         this.renderer.shadowMap.enabled = true;
@@ -35,8 +38,14 @@ export class RenderSystem {
         this.renderer.setSize(width, height);
     }
 
-    render() {
-        // Rotate the cube for some basic animation
+    renderPlayer(player: Player) {
+        // Update player object position based on player data
+        player.object3d.position.set(player.x, player.y, player.z);
+    }
+
+    render(player: Player) {
+        this.renderPlayer(player);
         this.renderer.render(this.scene, this.camera);
     }
+
 }
