@@ -1,8 +1,8 @@
 import './style.css'
-import { setupCounter } from './counter.ts'
+import { Game } from './core/game'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<button id="counter" type="button" class="counter"></button>
-`
+console.log('Hello world!')
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+const game = new Game()
+
+console.log(game)

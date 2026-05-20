@@ -1,0 +1,28 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000000;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    color: #ffffff;
+}
+
+#gameContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+#threeCanvasContainer {
+    background: #333333;
+}
+
+#threeCanvasContainer canvas {
+    border: 2px solid #ffffff;
+}
