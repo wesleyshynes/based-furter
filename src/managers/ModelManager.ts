@@ -17,7 +17,7 @@ export class ModelManager {
         const placeholderModel = new THREE.Mesh(geometry, material);
         placeholderModel.position.set(0, 1, 0);
         placeholderModel.castShadow = true;
-        
+
         const loader = new GLTFLoader();
 
         this.models[name] = {

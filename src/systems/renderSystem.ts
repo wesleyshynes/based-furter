@@ -67,7 +67,7 @@ export class RenderSystem {
         }
 
         // Update player object position based on player data
-        playerModel.position.set(player.x, player.y, player.z);
+        playerModel?.position.set(player.x, player.y, player.z);
 
         // move camera to follow the player
         this.camera.position.set(player.x, player.y + 5, player.z + 3);
