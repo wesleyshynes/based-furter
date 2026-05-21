@@ -2,9 +2,12 @@ import * as THREE from 'three';
 import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
+import { ModelManager } from '../managers/ModelManager';
 
 export class Game {
     private canvas: HTMLDivElement;
+
+    private modelManager: ModelManager;
 
     private player: Player;
 
@@ -20,10 +23,13 @@ export class Game {
     constructor() {
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
 
-        this.renderSystem = new RenderSystem(this.canvas);
+        // Load all models
+        this.modelManager = new ModelManager();
+        this.modelManager.loadAll();
+
+        this.renderSystem = new RenderSystem(this.canvas, this.modelManager);
 
         this.player = new Player();
-        this.renderSystem.addToScene(this.player.object3d);
 
         // Create a cube and add it to the scene
         const geometry = new THREE.BoxGeometry();

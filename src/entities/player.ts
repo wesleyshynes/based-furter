@@ -1,6 +1,4 @@
-import * as THREE from 'three';
 import { GRID_SIZE, PLAYER_START_COORDS } from '../core/constants';
-
 export class Player {
 
     x: number;
@@ -11,8 +9,6 @@ export class Player {
 
     speed: number;
 
-    object3d: THREE.Object3D;
-
     constructor() {
         this.x = PLAYER_START_COORDS.x;
         this.y = PLAYER_START_COORDS.y;
@@ -20,13 +16,6 @@ export class Player {
 
         this.radius = 0.5;
         this.speed = 5;
-
-        // Create a simple sphere to represent the player
-        const geometry = new THREE.SphereGeometry(this.radius, 32, 32);
-        const material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-        this.object3d = new THREE.Mesh(geometry, material);
-        this.object3d.position.set(this.x, this.y, this.z);
-        this.object3d.castShadow = true;
     }
 
     update(dt: number, keys: { [key: string]: boolean }) {

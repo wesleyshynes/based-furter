@@ -1,14 +1,18 @@
 import * as THREE from 'three';
 import { GAME_HEIGHT, GAME_WIDTH } from '../core/constants';
 import type { Player } from '../entities/player';
+import type { ModelManager } from '../managers/ModelManager';
 
 export class RenderSystem {
     private canvas: HTMLDivElement;
     private renderer: THREE.WebGLRenderer;
     private scene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
+    private modelManager: ModelManager;
 
-    constructor(canvasElement: HTMLDivElement) {
+    private modelIds: { [key: string]: number };
+
+    constructor(canvasElement: HTMLDivElement, modelManager: ModelManager) {
         console.log('RenderSystem initialized');
         this.canvas = canvasElement;
 
@@ -20,6 +24,10 @@ export class RenderSystem {
         this.renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
         this.renderer.shadowMap.enabled = true;
         this.canvas.appendChild(this.renderer.domElement);
+
+        this.modelManager = modelManager;
+
+        this.modelIds = {};
     }
 
     addToScene(object: THREE.Object3D) {
@@ -39,11 +47,30 @@ export class RenderSystem {
     }
 
     renderPlayer(player: Player) {
+
+        const playerModel = this.modelManager.get('player');
+        let modelIdChanged = false;
+        const playerModelId = playerModel?.id;
+        if (playerModelId && this.modelIds['player'] !== playerModelId) {
+            modelIdChanged = true;
+            // remove old model from scene if it exists
+            if (this.modelIds['player']) {
+                const oldModel = this.scene.getObjectById(this.modelIds['player']);
+                if (oldModel) {
+                    this.scene.remove(oldModel);
+                }
+            }
+            this.modelIds['player'] = playerModelId;
+            if (playerModel && !this.scene.getObjectById(playerModel.id)) {
+                this.scene.add(playerModel);
+            }
+        }
+
         // Update player object position based on player data
-        player.object3d.position.set(player.x, player.y, player.z);
+        playerModel.position.set(player.x, player.y, player.z);
 
         // move camera to follow the player
-        this.camera.position.set(player.x, player.y + 3, player.z + 2);
+        this.camera.position.set(player.x, player.y + 5, player.z + 3);
         this.camera.lookAt(player.x, player.y, player.z);
     }
 
