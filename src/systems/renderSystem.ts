@@ -41,6 +41,10 @@ export class RenderSystem {
     renderPlayer(player: Player) {
         // Update player object position based on player data
         player.object3d.position.set(player.x, player.y, player.z);
+
+        // move camera to follow the player
+        this.camera.position.set(player.x, player.y + 3, player.z + 2);
+        this.camera.lookAt(player.x, player.y, player.z);
     }
 
     render(player: Player) {

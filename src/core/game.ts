@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GAME_HEIGHT, GAME_WIDTH } from './constants';
+import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 
@@ -12,6 +12,10 @@ export class Game {
     private light: THREE.PointLight;
 
     private renderSystem: RenderSystem;
+
+    private keys: { [key: string]: boolean };
+
+    private lastTime: number;
 
     constructor() {
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
@@ -36,19 +40,41 @@ export class Game {
         this.renderSystem.addToScene(this.light);
 
         // add a grid floor to the scene
-        const gridHelper = new THREE.GridHelper(20, 20);
-        gridHelper.position.set(0, 0, -4);
+        const gridHelper = new THREE.GridHelper(GRID_SIZE, GRID_DIVISIONS);
+        gridHelper.position.set(0, 0, 0);
         this.renderSystem.addToScene(gridHelper);
+
+        // Initialize input state        
+        this.keys = {};
+
+        this.lastTime = performance.now();
 
         this.init();
     }
 
     init() {
         this.resizeCanvas();
-        window.addEventListener('resize', () => {
-            this.resizeCanvas()
-        });
+        window.addEventListener('resize', () => { this.resizeCanvas() });
+        this.setupInput();
+
         requestAnimationFrame((t) => this.gameLoop(t));
+    }
+
+    setupInput() {
+        window.addEventListener('keydown', (event) => {
+            this.keys[event.key.toLowerCase()] = true;
+        });
+        window.addEventListener('keyup', (event) => {
+            this.keys[event.key.toLowerCase()] = false;
+        });
+        // Clear all keys when context menu is opened (e.g. right-click)
+        window.addEventListener('contextmenu', () => {
+            this.keys = {};
+        });
+        // Clear all keys when window loses focus
+        window.addEventListener('blur', () => {
+            this.keys = {};
+        });
     }
 
     resizeCanvas() {
@@ -71,17 +97,23 @@ export class Game {
         this.renderSystem.resize(w, h);
     }
 
-    update() {
+    gameLoop(timestamp: number) {
+
+        const dt = (timestamp - this.lastTime) / 1000; // convert to seconds
+        this.lastTime = timestamp;
+
+        // console.log('game loop', timestamp);
+        requestAnimationFrame((t) => this.gameLoop(t));
+        this.update(dt);
+        this.renderSystem.render(this.player);
+    }
+
+    update(dt: number) {
         // Rotate the cube for some basic animation
         this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
-    }
 
-    gameLoop(timestamp?: number) {
-        // console.log('game loop', timestamp);
-        requestAnimationFrame((t) => this.gameLoop(t));
-        this.update();
-        this.renderSystem.render(this.player);
+        this.player.update(dt, this.keys);
     }
 
 }
