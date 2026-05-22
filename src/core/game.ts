@@ -53,7 +53,7 @@ export class Game {
         // Initialize input state        
         this.keys = {};
 
-        this.lastTime = performance.now();
+        this.lastTime = 0;
 
         this.init();
     }

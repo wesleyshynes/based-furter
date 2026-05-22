@@ -19,7 +19,7 @@ export class RenderSystem {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, GAME_WIDTH / GAME_HEIGHT, 0.1, 1000);
         // Position the camera so we can see the scene
-        this.camera.position.set(0, 2, 2);
+        this.camera.position.set(0, 20, 20);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(GAME_WIDTH, GAME_HEIGHT);
         this.renderer.shadowMap.enabled = true;
@@ -70,8 +70,9 @@ export class RenderSystem {
         playerModel?.position.set(player.x, player.y, player.z);
 
         // move camera to follow the player
-        this.camera.position.set(player.x, player.y + 5, player.z + 3);
-        this.camera.lookAt(player.x, player.y, player.z);
+        // this.camera.position.set(player.x, player.y + 5, player.z + 3);
+        // this.camera.lookAt(player.x, player.y, player.z);
+        this.camera.lookAt(0, 0, 8);
     }
 
     render(player: Player) {
