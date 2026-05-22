@@ -83,6 +83,18 @@ export class Game {
         });
     }
 
+    setupUI(){
+
+    }
+
+    hideAllPanels() {
+
+    }
+
+    startGame() {
+        
+    }
+
     resizeCanvas() {
         const ratio = GAME_WIDTH / GAME_HEIGHT;
 
