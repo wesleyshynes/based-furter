@@ -43,8 +43,7 @@ export class ModelManager {
                 loaded: true,
                 error: null,
             }
-
-            console.log(`Model ${name} loaded from ${url}`);
+            
         }, undefined, (error) => {
             console.error(`Error loading model ${name} from ${url}:`, error);
             this.models[name] = {

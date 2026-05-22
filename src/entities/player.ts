@@ -18,6 +18,12 @@ export class Player {
         this.speed = 5;
     }
 
+    reset() {
+        this.x = PLAYER_START_COORDS.x;
+        this.y = PLAYER_START_COORDS.y;
+        this.z = PLAYER_START_COORDS.z;
+    }
+
     update(dt: number, keys: { [key: string]: boolean }) {
 
         let dx = 0, dy = 0, dz = 0;

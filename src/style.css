@@ -50,6 +50,12 @@ body {
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
+.ui-panel h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
 button {
     background: #ffffff;
     color: #000000;

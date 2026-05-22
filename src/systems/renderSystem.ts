@@ -13,7 +13,7 @@ export class RenderSystem {
     private modelIds: { [key: string]: number };
 
     constructor(canvasElement: HTMLDivElement, modelManager: ModelManager) {
-        console.log('RenderSystem initialized');
+
         this.canvas = canvasElement;
 
         this.scene = new THREE.Scene();

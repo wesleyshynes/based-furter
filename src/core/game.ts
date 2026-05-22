@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
+import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE, PLAYER_START_COORDS } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';
@@ -19,6 +19,8 @@ export class Game {
     private keys: { [key: string]: boolean };
 
     private lastTime: number;
+
+    private state: 'menu' | 'playing' | 'paused' = 'menu';
 
     constructor() {
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
@@ -62,6 +64,7 @@ export class Game {
         this.resizeCanvas();
         window.addEventListener('resize', () => { this.resizeCanvas() });
         this.setupInput();
+        this.setupUI();
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }
@@ -69,6 +72,15 @@ export class Game {
     setupInput() {
         window.addEventListener('keydown', (event) => {
             this.keys[event.key.toLowerCase()] = true;
+
+            if (event.key === 'Escape') {
+                console.log('Escape pressed, toggling pause');  
+                if (this.state === 'playing') {
+                    this.pause();
+                } else if (this.state === 'paused') {
+                    this.resume();
+                }
+            }
         });
         window.addEventListener('keyup', (event) => {
             this.keys[event.key.toLowerCase()] = false;
@@ -83,16 +95,66 @@ export class Game {
         });
     }
 
-    setupUI(){
-
+    setupUI() {
+        // startGame when playBtn is clicked
+        const playBtn = document.getElementById('playBtn');
+        if (playBtn) {
+            playBtn.onclick = () => this.startGame();
+        }
+        // quitToMenu when quitBtn is clicked
+        const quitBtn = document.getElementById('quitBtn');
+        if (quitBtn) {
+            quitBtn.onclick = () => this.returnToMenu();
+        }
+        // resume game when resumeBtn is clicked
+        const resumeBtn = document.getElementById('resumeBtn');
+        if (resumeBtn) {
+            resumeBtn.onclick = () => this.resume();
+        }
     }
 
     hideAllPanels() {
-
+        const uiPanels = document.querySelectorAll('.ui-panel');
+        if (uiPanels) {
+            // remove active class from all panels
+            uiPanels.forEach(panel => panel.classList.remove('active'));
+        }
     }
 
     startGame() {
-        
+        console.log('start game');
+        this.state = 'playing';
+        this.hideAllPanels();
+
+        // reset player position and state
+        this.player.reset();
+
+        this.lastTime = performance.now();
+    }
+
+    pause() {
+        this.state = 'paused';
+        const pauseMenu = document.getElementById('pauseMenu');
+        if (pauseMenu) {
+            pauseMenu.classList.add('active');
+        }
+    }
+
+    resume() {
+        this.state = 'playing';
+        const pauseMenu = document.getElementById('pauseMenu');
+        if (pauseMenu) {
+            pauseMenu.classList.remove('active');
+        }
+    }
+
+    returnToMenu() {
+        this.state = 'menu';
+        this.hideAllPanels();
+        const mainMenu = document.getElementById('mainMenu');
+        if (mainMenu) {
+            mainMenu.classList.add('active');
+        }
     }
 
     resizeCanvas() {
@@ -123,15 +185,28 @@ export class Game {
         // console.log('game loop', timestamp);
         requestAnimationFrame((t) => this.gameLoop(t));
         this.update(dt);
-        this.renderSystem.render(this.player);
+        this.render();
     }
 
     update(dt: number) {
+
+        if (this.state !== 'playing') {
+            return;
+        }
+
         // Rotate the cube for some basic animation
-        this.cube.rotation.x += 0.01;
-        this.cube.rotation.y += 0.01;
+        this.cube.rotation.x += 1 * dt;
+        this.cube.rotation.y += 1 * dt;
 
         this.player.update(dt, this.keys);
+    }
+
+    render() {
+        if (this.state === 'menu') {
+            
+        } else {
+            this.renderSystem.render(this.player);
+        }
     }
 
 }
