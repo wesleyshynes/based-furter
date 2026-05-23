@@ -32,16 +32,12 @@ export class AudioManager {
     }
 
     play(name: string) {
-        const sound = this.sounds[name];
-        if (sound && sound.loaded) {
+        const sound = this.sounds[name]?.loaded ? this.sounds[name] : null;
+        if (sound) {
             sound.audio.currentTime = 0; // reset to start
             sound.audio.play().catch((error: any) => {
                 console.error(`Error playing sound ${name}:`, error);
             });
-        } else if (sound && sound.error) {
-            console.warn(`Cannot play sound ${name} because it failed to load:`, sound.error);
-        } else {
-            console.warn(`Sound ${name} not found`);
         }
     }
 
