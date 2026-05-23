@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
+import { ASPECT_RATIO, GAME_HEIGHT, GAME_MARGIN, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';
@@ -143,20 +143,18 @@ export class Game {
     }
 
     resizeCanvas() {
-        const ratio = GAME_WIDTH / GAME_HEIGHT;
 
         let w, h;
-        const margin = 15
 
-        const availableWidth = window.innerWidth - margin * 2;
-        const availableHeight = window.innerHeight - margin * 2;
+        const availableWidth = window.innerWidth - GAME_MARGIN * 2;
+        const availableHeight = window.innerHeight - GAME_MARGIN * 2;
 
-        if (availableWidth / availableHeight > ratio) {
+        if (availableWidth / availableHeight > ASPECT_RATIO) {
             h = availableHeight;
-            w = h * ratio;
+            w = h * ASPECT_RATIO;
         } else {
             w = availableWidth;
-            h = w / ratio;
+            h = w / ASPECT_RATIO;
         }
 
         this.renderSystem.resize(w, h);

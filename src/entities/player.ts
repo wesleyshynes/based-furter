@@ -1,4 +1,5 @@
 import { GRID_SIZE, PLAYER_START_COORDS } from '../core/constants';
+import { playerData } from '../data/playerData';
 export class Player {
 
     x: number;
@@ -14,8 +15,8 @@ export class Player {
         this.y = PLAYER_START_COORDS.y;
         this.z = PLAYER_START_COORDS.z;
 
-        this.radius = 0.5;
-        this.speed = 5;
+        this.radius = playerData.radius;
+        this.speed = playerData.speed;
     }
 
     reset() {
