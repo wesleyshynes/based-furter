@@ -7,6 +7,9 @@ export class UIManager {
     private mainMenuEl: HTMLElement | null;
     private pauseMenuEl: HTMLElement | null;
     private loadingScreenEl: HTMLElement | null;
+    private playBtnEl: HTMLElement | null;
+    private resumeBtnEl: HTMLElement | null;
+    private quitBtnEl: HTMLElement | null;
 
     constructor(game: Game) {
         this.game = game;
@@ -14,27 +17,30 @@ export class UIManager {
         this.mainMenuEl = document.getElementById('mainMenu');
         this.pauseMenuEl = document.getElementById('pauseMenu');
         this.loadingScreenEl = document.getElementById('loadingScreen');
+        this.playBtnEl = document.getElementById('playBtn');
+        this.resumeBtnEl = document.getElementById('resumeBtn');
+        this.quitBtnEl = document.getElementById('quitBtn');
         this.setupEventListeners();
     }
 
     setupEventListeners() {
         // startGame when playBtn is clicked
-        document.getElementById('playBtn')?.addEventListener('click', () => {
+        this.playBtnEl?.addEventListener('click', () => {
             this.game.startGame();
         });
         // resume game when resumeBtn is clicked
-        document.getElementById('resumeBtn')?.addEventListener('click', () => {
+        this.resumeBtnEl?.addEventListener('click', () => {
             this.game.resume();
         });
         // quitToMenu when quitBtn is clicked
-        document.getElementById('quitBtn')?.addEventListener('click', () => {
+        this.quitBtnEl?.addEventListener('click', () => {
             this.game.returnToMenu();
         });
 
         // add hover sound effect to all buttons
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('mouseenter', () => {
-                this.game.audioManager.play('button_hover');
+        [this.playBtnEl, this.resumeBtnEl, this.quitBtnEl].forEach(button => {
+            button?.addEventListener('mouseenter', () => {
+                this.game.playSound('button_hover');
             });
         });
     }

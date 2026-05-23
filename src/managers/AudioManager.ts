@@ -20,7 +20,6 @@ export class AudioManager {
         return new Promise<void>((resolve) => {
             audio.onloadeddata = () => {
                 this.sounds[name].loaded = true;
-                console.log(`Sound ${name} loaded successfully`);
                 resolve();
             }
             audio.onerror = (error) => {

@@ -63,8 +63,9 @@ export class ModelManager {
     }
 
     async loadAll() {
-        // wait for 3 seconds to simulate loading time
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // wait to simulate loading time
+        const DEBUG_LOAD_DELAY = 1000;
+        await new Promise(resolve => setTimeout(resolve, DEBUG_LOAD_DELAY));
 
         await Promise.all([
             this.load('player', Animated_Robot, { scale: 0.5 }),

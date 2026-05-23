@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GAME_HEIGHT, GAME_WIDTH } from '../core/constants';
+import { GAME_HEIGHT, GAME_STATES, GAME_WIDTH } from '../core/constants';
 import type { Player } from '../entities/player';
 import type { ModelManager } from '../managers/ModelManager';
 
@@ -80,7 +80,7 @@ export class RenderSystem {
 
     render(state: string, player: Player) {
 
-        if (state !== 'playing') {
+        if (state !== GAME_STATES.PLAYING) {
             this.renderer.render(this.pauseScene, this.camera);
         } else {
             this.renderPlayer(player);
