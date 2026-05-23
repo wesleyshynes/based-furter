@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE, PLAYER_START_COORDS } from './constants';
+import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';

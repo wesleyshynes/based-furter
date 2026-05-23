@@ -1,4 +1,4 @@
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from 'three';
 import Animated_Robot from '../assets/models/glb/Animated_Robot.glb';
 
@@ -27,7 +27,7 @@ export class ModelManager {
         }
 
         return new Promise<void>((resolve) => {
-            loader.load(url, (gltf) => {
+            loader.load(url, (gltf: GLTF) => {
                 const model = gltf.scene;
                 model.position.set(0, 1, 0);
                 model.scale.set(options.scale, options.scale, options.scale);
