@@ -27,6 +27,10 @@ body {
     border: 2px solid #ffffff;
 }
 
+#loadingScreen {
+    padding: 40px;
+}
+
 .ui-panel {
     position: absolute;
     background: rgba(0, 0, 0, 0.5);
@@ -74,4 +78,22 @@ button:hover {
     color: #000000;
     transform: translateY(-2px);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+#timer {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    z-index: 1000;
+    display: none;
+    pointer-events: none;
 }

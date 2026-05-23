@@ -3,11 +3,15 @@ import { GAME_HEIGHT, GAME_WIDTH, GRID_DIVISIONS, GRID_SIZE, PLAYER_START_COORDS
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';
+import { AudioManager } from '../managers/AudioManager';
+import { UIManager } from '../managers/UIManager';
 
 export class Game {
     private canvas: HTMLDivElement;
 
     private modelManager: ModelManager;
+    public audioManager: AudioManager;
+    private uiManager: UIManager;
 
     private player: Player;
 
@@ -19,15 +23,16 @@ export class Game {
     private keys: { [key: string]: boolean };
 
     private lastTime: number;
+    private time: number;
 
     private state: 'menu' | 'playing' | 'paused' = 'menu';
 
     constructor() {
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
 
-        // Load all models
         this.modelManager = new ModelManager();
-        this.modelManager.loadAll();
+        this.audioManager = new AudioManager();
+        this.uiManager = new UIManager(this);
 
         this.renderSystem = new RenderSystem(this.canvas, this.modelManager);
 
@@ -56,15 +61,24 @@ export class Game {
         this.keys = {};
 
         this.lastTime = 0;
+        this.time = 0
 
         this.init();
     }
 
-    init() {
+    async init() {
+
+        await Promise.all([
+            this.modelManager.loadAll(),
+            this.audioManager.loadAll(),
+        ]);
+
+        this.uiManager.showPanel('mainMenu');
+
         this.resizeCanvas();
         window.addEventListener('resize', () => { this.resizeCanvas() });
         this.setupInput();
-        this.setupUI();
+        this.uiManager.setupEventListeners();
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }
@@ -74,7 +88,7 @@ export class Game {
             this.keys[event.key.toLowerCase()] = true;
 
             if (event.key === 'Escape') {
-                console.log('Escape pressed, toggling pause');  
+                console.log('Escape pressed, toggling pause');
                 if (this.state === 'playing') {
                     this.pause();
                 } else if (this.state === 'paused') {
@@ -95,36 +109,13 @@ export class Game {
         });
     }
 
-    setupUI() {
-        // startGame when playBtn is clicked
-        const playBtn = document.getElementById('playBtn');
-        if (playBtn) {
-            playBtn.onclick = () => this.startGame();
-        }
-        // quitToMenu when quitBtn is clicked
-        const quitBtn = document.getElementById('quitBtn');
-        if (quitBtn) {
-            quitBtn.onclick = () => this.returnToMenu();
-        }
-        // resume game when resumeBtn is clicked
-        const resumeBtn = document.getElementById('resumeBtn');
-        if (resumeBtn) {
-            resumeBtn.onclick = () => this.resume();
-        }
-    }
-
-    hideAllPanels() {
-        const uiPanels = document.querySelectorAll('.ui-panel');
-        if (uiPanels) {
-            // remove active class from all panels
-            uiPanels.forEach(panel => panel.classList.remove('active'));
-        }
-    }
-
     startGame() {
         console.log('start game');
+        this.audioManager.play('button_click');
         this.state = 'playing';
-        this.hideAllPanels();
+        this.uiManager.hideAllPanels();
+        this.time = 0;
+        this.uiManager.showTimer();
 
         // reset player position and state
         this.player.reset();
@@ -133,28 +124,22 @@ export class Game {
     }
 
     pause() {
+        this.audioManager.play('pause');
         this.state = 'paused';
-        const pauseMenu = document.getElementById('pauseMenu');
-        if (pauseMenu) {
-            pauseMenu.classList.add('active');
-        }
+        this.uiManager.showPanel('pauseMenu');
     }
 
     resume() {
+        this.audioManager.play('unpause');
         this.state = 'playing';
-        const pauseMenu = document.getElementById('pauseMenu');
-        if (pauseMenu) {
-            pauseMenu.classList.remove('active');
-        }
+        this.uiManager.hideAllPanels();
     }
 
     returnToMenu() {
+        this.audioManager.play('button_click');
         this.state = 'menu';
-        this.hideAllPanels();
-        const mainMenu = document.getElementById('mainMenu');
-        if (mainMenu) {
-            mainMenu.classList.add('active');
-        }
+        this.uiManager.hideTimer();
+        this.uiManager.showPanel('mainMenu');
     }
 
     resizeCanvas() {
@@ -182,14 +167,18 @@ export class Game {
         const dt = (timestamp - this.lastTime) / 1000; // convert to seconds
         this.lastTime = timestamp;
 
-        // console.log('game loop', timestamp);
-        requestAnimationFrame((t) => this.gameLoop(t));
+        if (this.state === 'playing') {
+            this.time += dt;
+            this.uiManager.updateTimer(this.time);
+        }
+
         this.update(dt);
-        this.render();
+        this.renderSystem.render(this.state, this.player);
+
+        requestAnimationFrame((t) => this.gameLoop(t));
     }
 
     update(dt: number) {
-
         if (this.state !== 'playing') {
             return;
         }
@@ -199,14 +188,6 @@ export class Game {
         this.cube.rotation.y += 1 * dt;
 
         this.player.update(dt, this.keys);
-    }
-
-    render() {
-        if (this.state === 'menu') {
-            
-        } else {
-            this.renderSystem.render(this.player);
-        }
     }
 
 }

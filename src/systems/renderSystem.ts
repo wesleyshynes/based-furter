@@ -7,6 +7,7 @@ export class RenderSystem {
     private canvas: HTMLDivElement;
     private renderer: THREE.WebGLRenderer;
     private scene: THREE.Scene;
+    private pauseScene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
     private modelManager: ModelManager;
 
@@ -15,6 +16,8 @@ export class RenderSystem {
     constructor(canvasElement: HTMLDivElement, modelManager: ModelManager) {
 
         this.canvas = canvasElement;
+
+        this.pauseScene = new THREE.Scene();
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, GAME_WIDTH / GAME_HEIGHT, 0.1, 1000);
@@ -75,9 +78,15 @@ export class RenderSystem {
         this.camera.lookAt(0, 0, 8);
     }
 
-    render(player: Player) {
-        this.renderPlayer(player);
-        this.renderer.render(this.scene, this.camera);
+    render(state: string, player: Player) {
+
+        if (state !== 'playing') {
+            this.renderer.render(this.pauseScene, this.camera);
+        } else {
+            this.renderPlayer(player);
+            this.renderer.render(this.scene, this.camera);
+        }
+
     }
 
 }

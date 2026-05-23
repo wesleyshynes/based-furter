@@ -1,33 +1,45 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>based-furter</title>
-  </head>
-  <body>
-    <div id="gameContainer">
-      <div id="threeCanvasContainer"></div>
 
-      <!-- Main Menu -->
-      <div id="mainMenu" class="ui-panel active">
-        <h1>Tree Dee</h1>
-        <button id="playBtn">Play</button>
-        <div style="margin-top: 20px;font-size: 12px;">
-          <h2>Controls</h2>
-          <p>WASD - Move</p>
-          <p>Esc - Pause</p>
-        </div>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>based-furter</title>
+</head>
 
-      <!-- Pause Menu -->
-      <div id="pauseMenu" class="ui-panel">
-        <h2>Paused</h2>
-        <button id="resumeBtn">Resume</button>
-        <button id="quitBtn">Quit to Menu</button>  
+<body>
+  <div id="gameContainer">
+    <div id="threeCanvasContainer"></div>
+
+    <!-- Timer -->
+    <div id="timer" >0:00 </div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu" class="ui-panel">
+      <h1>Tree Dee</h1>
+      <button id="playBtn">Play</button>
+      <div style="margin-top: 20px;font-size: 12px;">
+        <h2>Controls</h2>
+        <p>WASD - Move</p>
+        <p>Esc - Pause</p>
       </div>
     </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+    <!-- Pause Menu -->
+    <div id="pauseMenu" class="ui-panel">
+      <h2>Paused</h2>
+      <button id="resumeBtn">Resume</button>
+      <button id="quitBtn">Quit to Menu</button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="ui-panel active">
+      <h2>Loading...</h2>
+      <p>Jiggling the pikafuse.</p>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

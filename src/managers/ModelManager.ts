@@ -1,6 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from 'three';
-import Animated_Robot from '../assets/glb/Animated_Robot.glb';
+import Animated_Robot from '../assets/models/glb/Animated_Robot.glb';
 
 export class ModelManager {
     private models: { [key: string]: any };
@@ -26,39 +26,48 @@ export class ModelManager {
             error: null,
         }
 
-        loader.load(url, (gltf) => {
-            const model = gltf.scene;
-            model.position.set(0, 1, 0);
-            model.scale.set(options.scale, options.scale, options.scale);
-            model.castShadow = true;
-
-            model.traverse((child) => {
-                if ((child as THREE.Mesh).isMesh) {
-                    (child as THREE.Mesh).castShadow = true;
+        return new Promise<void>((resolve) => {
+            loader.load(url, (gltf) => {
+                const model = gltf.scene;
+                model.position.set(0, 1, 0);
+                model.scale.set(options.scale, options.scale, options.scale);
+                model.castShadow = true;
+    
+                model.traverse((child) => {
+                    if ((child as THREE.Mesh).isMesh) {
+                        (child as THREE.Mesh).castShadow = true;
+                    }
+                });
+    
+                this.models[name] = {
+                    model: model,
+                    loaded: true,
+                    error: null,
                 }
+                resolve();
+    
+            }, undefined, (error) => {
+                console.error(`Error loading model ${name} from ${url}:`, error);
+                this.models[name] = {
+                    model: placeholderModel,
+                    loaded: false,
+                    error: error,
+                };
+                resolve();
             });
-
-            this.models[name] = {
-                model: model,
-                loaded: true,
-                error: null,
-            }
-            
-        }, undefined, (error) => {
-            console.error(`Error loading model ${name} from ${url}:`, error);
-            this.models[name] = {
-                model: placeholderModel,
-                loaded: false,
-                error: error,
-            };
-        });
+        })
     }
 
     get(name: string) {
         return this.models[name]?.model || null;
     }
 
-    loadAll() {
-        this.load('player', Animated_Robot, { scale: 0.5 });
+    async loadAll() {
+        // wait for 3 seconds to simulate loading time
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        await Promise.all([
+            this.load('player', Animated_Robot, { scale: 0.5 }),
+        ]);
     }
 }
