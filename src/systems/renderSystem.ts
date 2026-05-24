@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GAME_HEIGHT, GAME_STATES, GAME_WIDTH } from '../core/constants';
 import type { Player } from '../entities/player';
 import type { ModelManager } from '../managers/ModelManager';
+import type { Enemy } from '../entities/enemy';
 
 export class RenderSystem {
     private canvas: HTMLDivElement;
@@ -52,19 +53,9 @@ export class RenderSystem {
     renderPlayer(player: Player) {
 
         const playerModel = this.modelManager.get('player');
-        let modelIdChanged = false;
-        const playerModelId = playerModel?.id;
-        if (playerModelId && this.modelIds['player'] !== playerModelId) {
-            modelIdChanged = true;
-            // remove old model from scene if it exists
-            if (this.modelIds['player']) {
-                const oldModel = this.scene.getObjectById(this.modelIds['player']);
-                if (oldModel) {
-                    this.scene.remove(oldModel);
-                }
-            }
-            this.modelIds['player'] = playerModelId;
-            if (playerModel && !this.scene.getObjectById(playerModel.id)) {
+        if (!this.modelIds['player']) {
+            this.modelIds['player'] = playerModel?.id;
+            if (playerModel) {
                 this.scene.add(playerModel);
             }
         }
@@ -78,12 +69,32 @@ export class RenderSystem {
         this.camera.lookAt(0, 0, 8);
     }
 
-    render(state: string, player: Player) {
+    renderEnemies(enemies: Enemy[]) {
+        // TODO: need to add some kind of cloning or instancing system to handle multiple enemies without needing a unique model for each one
+        for (let i = 0; i < enemies.length; i++) {
+            const enemy = enemies[i];
+            const enemyId = `enemy_${i}`;
+            if (!this.modelIds[enemyId]) {
+                const enemyModel = this.modelManager.get('enemy');
+                const enemyModelClone = enemyModel?.clone();
+                if (enemyModelClone) {
+                    this.scene.add(enemyModelClone);
+                    this.modelIds[enemyId] = enemyModelClone.id;
+                }
+            }
+            const enemyModel = this.scene.getObjectById(this.modelIds[enemyId]);
+            // Update enemy object position based on enemy data
+            enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
+        }
+    }
+
+    render(state: string, player: Player, enemies: Enemy[] = []) {
 
         if (state !== GAME_STATES.PLAYING) {
             this.renderer.render(this.pauseScene, this.camera);
         } else {
             this.renderPlayer(player);
+            this.renderEnemies(enemies);
             this.renderer.render(this.scene, this.camera);
         }
 

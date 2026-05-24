@@ -58,6 +58,20 @@ export class ModelManager {
         })
     }
 
+    loadSphere(name: string, radius: number, color: number) {
+        const geometry = new THREE.SphereGeometry(radius, 32, 32);
+        const material = new THREE.MeshPhongMaterial({ color: color });
+        const model = new THREE.Mesh(geometry, material);
+        model.position.set(0, radius, 0);
+        model.castShadow = true;
+
+        this.models[name] = {
+            model: model,
+            loaded: true,
+            error: null,
+        }
+    }
+
     get(name: string) {
         return this.models[name]?.model || null;
     }
@@ -69,6 +83,7 @@ export class ModelManager {
 
         await Promise.all([
             this.load('player', Animated_Robot, { scale: 0.5 }),
+            this.loadSphere('enemy', 0.5, 0xff0000),
         ]);
     }
 }

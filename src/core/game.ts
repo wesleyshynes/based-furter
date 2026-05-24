@@ -5,6 +5,7 @@ import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';
 import { AudioManager } from '../managers/AudioManager';
 import { UIManager } from '../managers/UIManager';
+import { EnemyManager } from '../managers/EnemyManager';
 
 export class Game {
     private canvas: HTMLDivElement;
@@ -12,6 +13,7 @@ export class Game {
     private modelManager: ModelManager;
     public audioManager: AudioManager;
     private uiManager: UIManager;
+    private enemyManager: EnemyManager;
 
     private player: Player;
 
@@ -35,6 +37,7 @@ export class Game {
         this.modelManager = new ModelManager();
         this.audioManager = new AudioManager();
         this.uiManager = new UIManager(this);
+        this.enemyManager = new EnemyManager();
 
         this.renderSystem = new RenderSystem(this.canvas, this.modelManager);
 
@@ -120,6 +123,9 @@ export class Game {
         // reset player position and state
         this.player.reset();
 
+        // spawn some enemies
+        this.enemyManager.spawn(-2, 3);
+
         this.lastTime = performance.now();
     }
 
@@ -175,7 +181,7 @@ export class Game {
         }
 
         this.update(dt);
-        this.renderSystem.render(this.state, this.player);
+        this.renderSystem.render(this.state, this.player, this.enemyManager.getActiveEnemies());
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }
@@ -190,6 +196,7 @@ export class Game {
         this.cube.rotation.y += 1 * dt;
 
         this.player.update(dt, this.keys);
+        this.enemyManager.update(dt, this.player);
     }
 
 }
