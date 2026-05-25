@@ -14,3 +14,5 @@ export const GAME_STATES = {
     PLAYING: 'playing',
     PAUSED: 'paused',
 }
+
+export const ENEMY_DESPAWN_DISTANCE = 20;

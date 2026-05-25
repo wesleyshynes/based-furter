@@ -122,9 +122,13 @@ export class Game {
 
         // reset player position and state
         this.player.reset();
-
+        // reset enemies
+        this.enemyManager.reset();
         // spawn some enemies
         this.enemyManager.spawn(-2, 3);
+        this.enemyManager.spawn(4, -5);
+        this.enemyManager.spawn(-3, -4);
+        this.enemyManager.spawn(5, 2);
 
         this.lastTime = performance.now();
     }

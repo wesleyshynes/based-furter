@@ -70,23 +70,26 @@ export class RenderSystem {
     }
 
     renderEnemies(enemies: Enemy[]) {
-        // TODO: need to add some kind of cloning or instancing system to handle multiple enemies without needing a unique model for each one
         for (let i = 0; i < enemies.length; i++) {
             const enemy = enemies[i];
             const enemyId = `enemy_${i}`;
-            if (!this.modelIds[enemyId]) {
-                const enemyModel = this.modelManager.get('enemy');
-                const enemyModelClone = enemyModel?.clone();
-                if (enemyModelClone) {
-                    this.scene.add(enemyModelClone);
-                    this.modelIds[enemyId] = enemyModelClone.id;
-                }
-            }
-            const enemyModel = this.scene.getObjectById(this.modelIds[enemyId]);
+            const enemyModel = this.keyedModel(enemyId, 'enemy');
             // Update enemy object position based on enemy data
             enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
         }
     }
+
+    keyedModel(key: string, modelId: string) {
+        if (!this.modelIds[key]) {
+            const model = this.modelManager.get(modelId);
+            const modelClone = model?.clone();
+            if (modelClone) {
+                this.scene.add(modelClone);
+                this.modelIds[key] = modelClone.id;
+            }
+        }
+        return this.scene.getObjectById(this.modelIds[key]);
+    } 
 
     render(state: string, player: Player, enemies: Enemy[] = []) {
 
