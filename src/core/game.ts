@@ -99,6 +99,13 @@ export class Game {
                     this.resume();
                 }
             }
+
+            // if space and not in menu span an enemy within 4 units of the player
+            if (event.key === ' ' && this.state !== GAME_STATES.MENU) {
+                const x = this.player.x + (Math.random() - 0.5) * 8;
+                const z = this.player.z + (Math.random() - 0.5) * 8;
+                this.enemyManager.spawn(x, z);
+            }
         });
         window.addEventListener('keyup', (event) => {
             this.keys[event.key.toLowerCase()] = false;

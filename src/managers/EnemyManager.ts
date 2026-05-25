@@ -3,13 +3,13 @@ import { Enemy } from "../entities/enemy";
 import { ObjectPooler } from "../utils/objectPooler";
 
 export class EnemyManager {
-    private pool: ObjectPooler<Enemy>;
+    pool: ObjectPooler<Enemy>;
 
     constructor() {
         const ENEMY_POOL_SIZE = 10;
 
-        this.pool = new ObjectPooler(() => {
-            return new Enemy(enemyData.drifter);
+        this.pool = new ObjectPooler((id: number) => {
+            return new Enemy(enemyData.drifter, id);
         }, ENEMY_POOL_SIZE);
     }
 

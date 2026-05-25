@@ -14,6 +14,8 @@ export class RenderSystem {
 
     private modelIds: { [key: string]: number };
 
+    private trackedModels: { [key: string]: boolean };
+
     constructor(canvasElement: HTMLDivElement, modelManager: ModelManager) {
 
         this.canvas = canvasElement;
@@ -32,6 +34,7 @@ export class RenderSystem {
         this.modelManager = modelManager;
 
         this.modelIds = {};
+        this.trackedModels = {};
     }
 
     addToScene(object: THREE.Object3D) {
@@ -72,10 +75,11 @@ export class RenderSystem {
     renderEnemies(enemies: Enemy[]) {
         for (let i = 0; i < enemies.length; i++) {
             const enemy = enemies[i];
-            const enemyId = `enemy_${i}`;
+            const enemyId = `enemy_${enemy.id}`;
             const enemyModel = this.keyedModel(enemyId, 'enemy');
             // Update enemy object position based on enemy data
             enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
+            this.trackedModels[enemyId] = true;
         }
     }
 
@@ -98,6 +102,19 @@ export class RenderSystem {
         } else {
             this.renderPlayer(player);
             this.renderEnemies(enemies);
+            Object.keys(this.trackedModels).forEach(key => {
+                if (!this.trackedModels[key]) {
+                    const modelId = this.modelIds[key];
+                    const model = this.scene.getObjectById(modelId);
+                    if (model) {
+                        this.scene.remove(model);
+                    }
+                    delete this.modelIds[key];
+                    return
+                }
+                // reset tracking for next frame
+                this.trackedModels[key] = false;
+            });
             this.renderer.render(this.scene, this.camera);
         }
 

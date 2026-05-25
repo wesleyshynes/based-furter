@@ -2,6 +2,9 @@ import { ENEMY_DESPAWN_DISTANCE } from "../core/constants";
 import type { EnemyDataType } from "../data/enemyData";
 
 export class Enemy {
+
+    id: number;
+
     x: number;
     y: number;
     z: number;
@@ -16,8 +19,9 @@ export class Enemy {
 
     private data: EnemyDataType;
 
-    constructor(data: EnemyDataType) {
+    constructor(data: EnemyDataType, id: number) {
         this.data = data;
+        this.id = id;
 
         this.x = 0;
         this.y = 0.5;
