@@ -104,7 +104,7 @@ export class Game {
             if (event.key === ' ' && this.state !== GAME_STATES.MENU) {
                 const x = this.player.x + (Math.random() - 0.5) * 8;
                 const z = this.player.z + (Math.random() - 0.5) * 8;
-                this.enemyManager.spawn(x, z);
+                this.enemyManager.spawn('drifter', x, z);
             }
         });
         window.addEventListener('keyup', (event) => {
@@ -132,10 +132,10 @@ export class Game {
         // reset enemies
         this.enemyManager.reset();
         // spawn some enemies
-        this.enemyManager.spawn(-2, 3);
-        this.enemyManager.spawn(4, -5);
-        this.enemyManager.spawn(-3, -4);
-        this.enemyManager.spawn(5, 2);
+        this.enemyManager.spawn('drifter', -2, 3);
+        this.enemyManager.spawn('drifter', 4, -5);
+        this.enemyManager.spawn('seeker', -3, -4);
+        this.enemyManager.spawn('seeker', 5, 2);
 
         this.lastTime = performance.now();
     }

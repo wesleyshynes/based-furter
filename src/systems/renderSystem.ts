@@ -75,8 +75,8 @@ export class RenderSystem {
     renderEnemies(enemies: Enemy[]) {
         for (let i = 0; i < enemies.length; i++) {
             const enemy = enemies[i];
-            const enemyId = `enemy_${enemy.id}`;
-            const enemyModel = this.keyedModel(enemyId, 'enemy');
+            const enemyId = `enemy_${enemy.type}_${enemy.id}`;
+            const enemyModel = this.keyedModel(enemyId, `enemy_${enemy.type}`);
             // Update enemy object position based on enemy data
             enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
             this.trackedModels[enemyId] = true;

@@ -1,9 +1,10 @@
 import { ENEMY_DESPAWN_DISTANCE } from "../core/constants";
 import type { EnemyDataType } from "../data/enemyData";
+import type { BehaviorType } from "./behaviors/behaviorType";
 
 export class Enemy {
 
-    id: number;
+    id: string;
 
     x: number;
     y: number;
@@ -13,15 +14,19 @@ export class Enemy {
     speed: number;
     damage: number;
     health: number;
-    color: string;
+    color: number;
 
     active: boolean;
 
     private data: EnemyDataType;
+    private behavior: BehaviorType;
+    type: string
 
-    constructor(data: EnemyDataType, id: number) {
-        this.data = data;
+    constructor(id: string, data: EnemyDataType, behavior: BehaviorType) {
         this.id = id;
+        this.data = data;
+        this.behavior = behavior;
+        this.type = data.type;
 
         this.x = 0;
         this.y = 0.5;
@@ -46,6 +51,7 @@ export class Enemy {
     reset() {
         this.health = this.data.health;
         this.active = false;
+        this.behavior.reset();
     }
 
     update(dt: number, player: { x: number; y: number; z: number }) {
@@ -54,19 +60,13 @@ export class Enemy {
         const dx = player.x - this.x;
         const dz = player.z - this.z;
         const len = Math.sqrt(dx * dx + dz * dz);
-        
+
         // despawn if too far from player
         if (len > ENEMY_DESPAWN_DISTANCE) {
             this.active = false;
             return;
         }
 
-        if (len > 0) {
-            const moveX = (dx / len) * this.speed * dt;
-            const moveZ = (dz / len) * this.speed * dt;
-
-            this.x += moveX;
-            this.z += moveZ;
-        }
+        this.behavior.update(this, dt, player);
     }
 }

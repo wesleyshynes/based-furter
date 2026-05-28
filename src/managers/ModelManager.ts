@@ -1,6 +1,7 @@
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from 'three';
 import Animated_Robot from '../assets/models/glb/Animated_Robot.glb';
+import { enemyData } from "../data/enemyData";
 
 export class ModelManager {
     private models: { [key: string]: any };
@@ -83,7 +84,10 @@ export class ModelManager {
 
         await Promise.all([
             this.load('player', Animated_Robot, { scale: 0.5 }),
-            this.loadSphere('enemy', 0.5, 0xff0000),
+            // this.loadSphere('enemy', 0.5, 0xff0000),
+            ...Object.keys(enemyData).map(type => {
+                return this.loadSphere(`enemy_${type}`, enemyData[type].radius, enemyData[type].color);
+            }),
         ]);
     }
 }
