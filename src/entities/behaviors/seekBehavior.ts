@@ -15,6 +15,10 @@ export class SeekBehavior implements BehaviorType {
             enemy.x += moveX;
             enemy.z += moveZ;
         }
+        // set angle based on movement direction
+        if (dx !== 0 || dz !== 0) {
+            enemy.angle = Math.atan2(dx, dz);
+        }
     }
-    reset() {}
+    reset() { }
 }

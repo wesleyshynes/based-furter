@@ -10,6 +10,8 @@ export class Enemy {
     y: number;
     z: number;
 
+    angle: number;
+
     radius: number;
     speed: number;
     damage: number;
@@ -31,6 +33,8 @@ export class Enemy {
         this.x = 0;
         this.y = 0.5;
         this.z = 0;
+
+        this.angle = 0;
 
         this.radius = data.radius;
         this.speed = data.speed;

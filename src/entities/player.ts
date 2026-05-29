@@ -10,6 +10,8 @@ export class Player {
 
     speed: number;
 
+    angle: number;
+
     constructor() {
         this.x = PLAYER_START_COORDS.x;
         this.y = PLAYER_START_COORDS.y;
@@ -17,6 +19,7 @@ export class Player {
 
         this.radius = playerData.radius;
         this.speed = playerData.speed;
+        this.angle = 0;
     }
 
     reset() {
@@ -53,6 +56,11 @@ export class Player {
         this.x += dx * dt;
         this.y += dy * dt;
         this.z += dz * dt;
+
+        // set the angle based on movement direction
+        if (dx !== 0 || dz !== 0) {
+            this.angle = Math.atan2(dx, dz);
+        }
 
         // keep player in bounds of the grid
         this.x = Math.max(-GRID_SIZE / 2 + this.radius, Math.min(GRID_SIZE / 2 - this.radius, this.x));

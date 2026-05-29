@@ -66,6 +66,14 @@ export class ModelManager {
         model.position.set(0, radius, 0);
         model.castShadow = true;
 
+        // add small ball in front of the sphere to know where it's facing at angle 0
+        const greenColor = 0x00ff00;
+        const frontIndicatorGeometry = new THREE.SphereGeometry(radius * 0.5, 16, 16);
+        const frontIndicatorMaterial = new THREE.MeshPhongMaterial({ color: greenColor });
+        const frontIndicator = new THREE.Mesh(frontIndicatorGeometry, frontIndicatorMaterial);
+        frontIndicator.position.set(0, 0, radius);
+        model.add(frontIndicator);        
+
         this.models[name] = {
             model: model,
             loaded: true,

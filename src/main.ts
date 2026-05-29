@@ -3,4 +3,4 @@ import { Game } from './core/game'
 
 const game = new Game()
 
-// continue https://www.youtube.com/watch?v=14W3f0HgLS8
+// continue https://www.youtube.com/watch?v=0lAC10NlWX0

@@ -66,6 +66,11 @@ export class RenderSystem {
         // Update player object position based on player data
         playerModel?.position.set(player.x, player.y, player.z);
 
+        // rotate player model based on angle smoothly
+        if (playerModel) {
+            playerModel.rotation.y += (player.angle - playerModel.rotation.y) * 0.1;
+        }
+
         // move camera to follow the player
         // this.camera.position.set(player.x, player.y + 5, player.z + 3);
         // this.camera.lookAt(player.x, player.y, player.z);
@@ -80,6 +85,10 @@ export class RenderSystem {
             // Update enemy object position based on enemy data
             enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
             this.trackedModels[enemyId] = true;
+            // rotate enemy model based on angle smoothly
+            if (enemyModel) {
+                enemyModel.rotation.y += (enemy.angle - enemyModel.rotation.y) * 0.1;
+            }
         }
     }
 

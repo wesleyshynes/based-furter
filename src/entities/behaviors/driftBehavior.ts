@@ -9,7 +9,7 @@ export class DriftBehavior implements BehaviorType {
     constructor() {
         this.angle = Math.random() * 2 * Math.PI; // Random initial angle
         this.changeTimer = 0;
-        this.changeInterval = 2 
+        this.changeInterval = 2
     }
 
     update(enemy: any, dt: number, player: any) {
@@ -25,6 +25,11 @@ export class DriftBehavior implements BehaviorType {
 
         enemy.x += dX * enemy.speed * dt;
         enemy.z += dZ * enemy.speed * dt;
+
+        // set angle based on movement direction
+        if (dX !== 0 || dZ !== 0) {
+            enemy.angle = Math.atan2(dX, dZ);
+        }
     }
     reset() {
         this.angle = Math.random() * 2 * Math.PI;

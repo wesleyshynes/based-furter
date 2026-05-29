@@ -6,6 +6,7 @@ import { ModelManager } from '../managers/ModelManager';
 import { AudioManager } from '../managers/AudioManager';
 import { UIManager } from '../managers/UIManager';
 import { EnemyManager } from '../managers/EnemyManager';
+import { EnemySpawner } from '../managers/EnemySpawner';
 
 export class Game {
     private canvas: HTMLDivElement;
@@ -14,6 +15,7 @@ export class Game {
     public audioManager: AudioManager;
     private uiManager: UIManager;
     private enemyManager: EnemyManager;
+    private enemySpawner: EnemySpawner;
 
     private player: Player;
 
@@ -38,6 +40,7 @@ export class Game {
         this.audioManager = new AudioManager();
         this.uiManager = new UIManager(this);
         this.enemyManager = new EnemyManager();
+        this.enemySpawner = new EnemySpawner(this.enemyManager);
 
         this.renderSystem = new RenderSystem(this.canvas, this.modelManager);
 
@@ -102,9 +105,7 @@ export class Game {
 
             // if space and not in menu span an enemy within 4 units of the player
             if (event.key === ' ' && this.state !== GAME_STATES.MENU) {
-                const x = this.player.x + (Math.random() - 0.5) * 8;
-                const z = this.player.z + (Math.random() - 0.5) * 8;
-                this.enemyManager.spawn('drifter', x, z);
+                this.enemySpawner.spawnWave();
             }
         });
         window.addEventListener('keyup', (event) => {
@@ -131,11 +132,7 @@ export class Game {
         this.player.reset();
         // reset enemies
         this.enemyManager.reset();
-        // spawn some enemies
-        this.enemyManager.spawn('drifter', -2, 3);
-        this.enemyManager.spawn('drifter', 4, -5);
-        this.enemyManager.spawn('seeker', -3, -4);
-        this.enemyManager.spawn('seeker', 5, 2);
+        this.enemySpawner.reset();
 
         this.lastTime = performance.now();
     }
@@ -208,6 +205,7 @@ export class Game {
 
         this.player.update(dt, this.keys);
         this.enemyManager.update(dt, this.player);
+        this.enemySpawner.update(dt);
     }
 
 }
