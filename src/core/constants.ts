@@ -16,7 +16,15 @@ export const GAME_STATES = {
 }
 
 export const ENEMY_DESPAWN_DISTANCE = 50;
-
 export const ENEMY_SPAWN_DISTANCE = 30;
-
 export const ENEMY_SPAWN_INTERVAL = 2;
+
+export const EVENTS = {
+    // Audio
+    SOUND: 'sound',
+    // Game State
+    GAME_START: 'game:start',
+    GAME_PAUSE: 'game:pause',
+    GAME_RESUME: 'game:resume',
+    GAME_RETURN_TO_MENU: 'game:returnToMenu',
+}

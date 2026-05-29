@@ -1,8 +1,10 @@
-import type { Game } from "../core/game";
+import { EVENTS } from "../core/constants";
+import type { EventEmitter } from "../core/eventEmitter";
 
 export class UIManager {
 
-    private game: Game;
+    private events: EventEmitter;
+
     private timerEl: HTMLElement | null;
     private mainMenuEl: HTMLElement | null;
     private pauseMenuEl: HTMLElement | null;
@@ -11,8 +13,8 @@ export class UIManager {
     private resumeBtnEl: HTMLElement | null;
     private quitBtnEl: HTMLElement | null;
 
-    constructor(game: Game) {
-        this.game = game;
+    constructor(events: EventEmitter) {
+        this.events = events;
         this.timerEl = document.getElementById('timer');
         this.mainMenuEl = document.getElementById('mainMenu');
         this.pauseMenuEl = document.getElementById('pauseMenu');
@@ -26,21 +28,25 @@ export class UIManager {
     setupEventListeners() {
         // startGame when playBtn is clicked
         this.playBtnEl?.addEventListener('click', () => {
-            this.game.startGame();
+            // this.game.startGame();
+            this.events.emit(EVENTS.GAME_START);
         });
         // resume game when resumeBtn is clicked
         this.resumeBtnEl?.addEventListener('click', () => {
-            this.game.resume();
+            // this.game.resume();
+            this.events.emit(EVENTS.GAME_RESUME);
         });
         // quitToMenu when quitBtn is clicked
         this.quitBtnEl?.addEventListener('click', () => {
-            this.game.returnToMenu();
+            // this.game.returnToMenu();
+            this.events.emit(EVENTS.GAME_RETURN_TO_MENU);
         });
 
         // add hover sound effect to all buttons
         [this.playBtnEl, this.resumeBtnEl, this.quitBtnEl].forEach(button => {
             button?.addEventListener('mouseenter', () => {
-                this.game.playSound('button_hover');
+                // this.game.playSound('button_hover');
+                this.events.emit(EVENTS.SOUND, 'button_hover');
             });
         });
     }

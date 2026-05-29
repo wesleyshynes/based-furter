@@ -24,7 +24,7 @@ export class EnemySpawner {
         this.spawnTimer += dt;
         if (this.spawnTimer >= this.spawnInterval) {
             this.spawnWave();
-            this.spawnTimer = 0;
+            this.spawnTimer -= this.spawnInterval;
         }
     }
     spawnWave() {
@@ -53,6 +53,9 @@ export class EnemySpawner {
                 x = -gridSize / 2;
                 z = (Math.random() - 0.5) * gridSize;
                 break;
+            default:
+                x = -gridSize / 2;
+                z = (Math.random() - 0.5) * gridSize;
         }
         this.enemyManager.spawn(type, x, z);
 

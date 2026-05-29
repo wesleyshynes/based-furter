@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ASPECT_RATIO, GAME_MARGIN, GAME_STATES, GRID_DIVISIONS, GRID_SIZE } from './constants';
+import { ASPECT_RATIO, EVENTS, GAME_MARGIN, GAME_STATES, GRID_DIVISIONS, GRID_SIZE } from './constants';
 import { RenderSystem } from '../systems/renderSystem';
 import { Player } from '../entities/player';
 import { ModelManager } from '../managers/ModelManager';
@@ -7,10 +7,12 @@ import { AudioManager } from '../managers/AudioManager';
 import { UIManager } from '../managers/UIManager';
 import { EnemyManager } from '../managers/EnemyManager';
 import { EnemySpawner } from '../managers/EnemySpawner';
+import { EventEmitter } from './eventEmitter';
 
 export class Game {
     private canvas: HTMLDivElement;
 
+    private events: EventEmitter;
     private modelManager: ModelManager;
     public audioManager: AudioManager;
     private uiManager: UIManager;
@@ -36,9 +38,11 @@ export class Game {
         this.state = GAME_STATES.MENU;
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
 
+        this.events = new EventEmitter();
+
         this.modelManager = new ModelManager();
         this.audioManager = new AudioManager();
-        this.uiManager = new UIManager(this);
+        this.uiManager = new UIManager(this.events);
         this.enemyManager = new EnemyManager();
         this.enemySpawner = new EnemySpawner(this.enemyManager);
 
@@ -81,6 +85,25 @@ export class Game {
             this.audioManager.loadAll(),
         ]);
 
+        // Sound Events
+        this.events.on(EVENTS.SOUND, (name: string) => {
+            this.audioManager.play(name);
+        });
+
+        // Game State Events
+        this.events.on(EVENTS.GAME_START, () => {
+            this.startGame();
+        });
+        this.events.on(EVENTS.GAME_PAUSE, () => {
+            this.pause();
+        });
+        this.events.on(EVENTS.GAME_RESUME, () => {
+            this.resume();
+        });
+        this.events.on(EVENTS.GAME_RETURN_TO_MENU, () => {
+            this.returnToMenu();
+        });
+
         this.uiManager.showPanel('mainMenu');
 
         this.resizeCanvas();
@@ -122,7 +145,7 @@ export class Game {
     }
 
     startGame() {
-        this.playSound('button_click');
+        this.events.emit(EVENTS.SOUND, 'button_click');
         this.state = GAME_STATES.PLAYING;
         this.uiManager.hideAllPanels();
         this.time = 0;
@@ -138,26 +161,22 @@ export class Game {
     }
 
     pause() {
-        this.playSound('pause');
+        this.events.emit(EVENTS.SOUND, 'pause');
         this.state = GAME_STATES.PAUSED;
         this.uiManager.showPanel('pauseMenu');
     }
 
     resume() {
-        this.playSound('unpause');
+        this.events.emit(EVENTS.SOUND, 'unpause');
         this.state = GAME_STATES.PLAYING;
         this.uiManager.hideAllPanels();
     }
 
     returnToMenu() {
-        this.playSound('button_click');
+        this.events.emit(EVENTS.SOUND, 'button_click');
         this.state = GAME_STATES.MENU;
         this.uiManager.hideTimer();
         this.uiManager.showPanel('mainMenu');
-    }
-
-    playSound(name: string) {
-        this.audioManager.play(name);
     }
 
     resizeCanvas() {
