@@ -91,16 +91,21 @@ export class ModelManager {
         const DEBUG_LOAD_DELAY = 1000;
         await new Promise(resolve => setTimeout(resolve, DEBUG_LOAD_DELAY));
 
-        await Promise.all([
-            this.load('player', playerData.model, playerData.modelOptions),
-            // this.loadSphere('enemy', 0.5, 0xff0000),
-            ...Object.keys(enemyData).map(type => {
-                if (enemyData[type].model) {
-                    const options = enemyData[type].modelOptions || { scale: 1 };
-                    return this.load(`enemy_${type}`, enemyData[type].model, options);
-                }
-                return this.loadSphere(`enemy_${type}`, enemyData[type].radius, enemyData[type].color);
-            }),
-        ]);
+        const modelsToLoad = [
+            { name: 'player', url: playerData.model, options: playerData.modelOptions },
+        ]
+        const spheresToLoad: { name: string; radius: number; color: number }[] = []
+
+        Object.keys(enemyData).forEach(type => {
+            if (enemyData[type].model) {
+                const options = enemyData[type].modelOptions || { scale: 1 };
+                modelsToLoad.push({ name: `enemy_${type}`, url: enemyData[type].model, options });
+            } else {
+                spheresToLoad.push({ name: `enemy_${type}`, radius: enemyData[type].radius, color: enemyData[type].color });
+            }
+        });
+
+        await Promise.all(modelsToLoad.map(({ name, url, options }) => this.load(name, url, options)));
+        spheresToLoad.forEach(({ name, radius, color }) => this.loadSphere(name, radius, color));
     }
 }

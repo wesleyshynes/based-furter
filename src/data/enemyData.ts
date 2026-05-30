@@ -38,6 +38,6 @@ export interface EnemyDataType {
     color: number;
     model?: any;
     modelOptions?: {
-        scale?: number;
+        scale: number;
     }
 }
