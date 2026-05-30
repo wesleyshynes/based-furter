@@ -1,7 +1,4 @@
-import PauseSound from '../assets/audio/pause.mp3';
-import UnpauseSound from '../assets/audio/button_click.mp3';
-import ButtonHoverSound from '../assets/audio/button_hover.mp3';
-import ButtonClickSound from '../assets/audio/button_click.mp3';
+import { audioData } from '../data/audioData';
 
 export class AudioManager {
     private sounds: { [key: string]: any };
@@ -41,11 +38,6 @@ export class AudioManager {
     }
 
     async loadAll() {
-        await Promise.all([
-            this.load('pause', PauseSound),
-            this.load('unpause', UnpauseSound),
-            this.load('button_hover', ButtonHoverSound),
-            this.load('button_click', ButtonClickSound),
-        ])
+        await Promise.all(audioData.map(({ name, path }) => this.load(name, path)));
     }
 }

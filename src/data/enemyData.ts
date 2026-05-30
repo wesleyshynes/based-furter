@@ -7,8 +7,9 @@ export const enemyData: {
         speed: 2,
         health: 1,
         damage: 1,
+        behaviorType: 'drift',
+
         color: 0xff0000,
-        behaviorType: 'drift'
     },
     seeker: {
         type: 'seeker',
@@ -16,8 +17,13 @@ export const enemyData: {
         speed: 3,
         health: 1,
         damage: 1,
+        behaviorType: 'seek',
+
         color: 0xffff00,
-        behaviorType: 'seek'
+        // model: Wolf,
+        // modelOptions: {
+        //     scale: 3,
+        // }
     }
 }
 
@@ -27,6 +33,11 @@ export interface EnemyDataType {
     speed: number;
     health: number;
     damage: number;
-    color: number;
     behaviorType: string;
+    
+    color: number;
+    model?: any;
+    modelOptions?: {
+        scale?: number;
+    }
 }

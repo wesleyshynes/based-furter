@@ -1,7 +1,7 @@
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from 'three';
-import Animated_Robot from '../assets/models/glb/Animated_Robot.glb';
 import { enemyData } from "../data/enemyData";
+import { playerData } from "../data/playerData";
 
 export class ModelManager {
     private models: { [key: string]: any };
@@ -30,23 +30,24 @@ export class ModelManager {
         return new Promise<void>((resolve) => {
             loader.load(url, (gltf: GLTF) => {
                 const model = gltf.scene;
+                // const model = gltf.scene.children[0];
                 model.position.set(0, 1, 0);
                 model.scale.set(options.scale, options.scale, options.scale);
                 model.castShadow = true;
-    
+
                 model.traverse((child) => {
                     if ((child as THREE.Mesh).isMesh) {
                         (child as THREE.Mesh).castShadow = true;
                     }
                 });
-    
+
                 this.models[name] = {
                     model: model,
                     loaded: true,
                     error: null,
                 }
                 resolve();
-    
+
             }, undefined, (error) => {
                 console.error(`Error loading model ${name} from ${url}:`, error);
                 this.models[name] = {
@@ -72,7 +73,7 @@ export class ModelManager {
         const frontIndicatorMaterial = new THREE.MeshPhongMaterial({ color: greenColor });
         const frontIndicator = new THREE.Mesh(frontIndicatorGeometry, frontIndicatorMaterial);
         frontIndicator.position.set(0, 0, radius);
-        model.add(frontIndicator);        
+        model.add(frontIndicator);
 
         this.models[name] = {
             model: model,
@@ -91,9 +92,13 @@ export class ModelManager {
         await new Promise(resolve => setTimeout(resolve, DEBUG_LOAD_DELAY));
 
         await Promise.all([
-            this.load('player', Animated_Robot, { scale: 0.5 }),
+            this.load('player', playerData.model, playerData.modelOptions),
             // this.loadSphere('enemy', 0.5, 0xff0000),
             ...Object.keys(enemyData).map(type => {
+                if (enemyData[type].model) {
+                    const options = enemyData[type].modelOptions || { scale: 1 };
+                    return this.load(`enemy_${type}`, enemyData[type].model, options);
+                }
                 return this.loadSphere(`enemy_${type}`, enemyData[type].radius, enemyData[type].color);
             }),
         ]);

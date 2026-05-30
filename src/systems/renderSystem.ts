@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { GAME_HEIGHT, GAME_STATES, GAME_WIDTH } from '../core/constants';
 import type { Player } from '../entities/player';
 import type { ModelManager } from '../managers/ModelManager';
@@ -95,7 +96,7 @@ export class RenderSystem {
     keyedModel(key: string, modelId: string) {
         if (!this.modelIds[key]) {
             const model = this.modelManager.get(modelId);
-            const modelClone = model?.clone();
+            const modelClone = model ? skeletonClone(model) : null;
             if (modelClone) {
                 this.scene.add(modelClone);
                 this.modelIds[key] = modelClone.id;

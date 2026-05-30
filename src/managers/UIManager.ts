@@ -5,6 +5,8 @@ export class UIManager {
 
     private events: EventEmitter;
 
+    private hudEl: HTMLElement | null;
+    private healthBarFillEl: HTMLElement | null;
     private timerEl: HTMLElement | null;
     private mainMenuEl: HTMLElement | null;
     private pauseMenuEl: HTMLElement | null;
@@ -15,7 +17,10 @@ export class UIManager {
 
     constructor(events: EventEmitter) {
         this.events = events;
+        this.hudEl = document.getElementById('hud');
         this.timerEl = document.getElementById('timer');
+        this.healthBarFillEl = document.getElementById('healthBarFill');
+
         this.mainMenuEl = document.getElementById('mainMenu');
         this.pauseMenuEl = document.getElementById('pauseMenu');
         this.loadingScreenEl = document.getElementById('loadingScreen');
@@ -65,14 +70,14 @@ export class UIManager {
         panel?.classList.add('active');
     }
 
-    showTimer() {
-        if (this.timerEl) {
-            this.timerEl.style.display = 'block';
+    showHUD() {
+        if (this.hudEl) {
+            this.hudEl.style.display = 'block';
         }
     }
-    hideTimer() {
-        if (this.timerEl) {
-            this.timerEl.style.display = 'none';
+    hideHUD() {
+        if (this.hudEl) {
+            this.hudEl.style.display = 'none';
         }
     }
     updateTimer(time: number) {
