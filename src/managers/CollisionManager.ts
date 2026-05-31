@@ -24,9 +24,13 @@ export class CollisionManager {
                 if (!enemy.active) continue; // Skip if enemy is already inactive
                 enemy.active = false;
                 const damageDealt = enemy.damage; // You can adjust this value or make it depend on the enemy type
-                const playerTookDamage = player.takeDamage(damageDealt);
-                if (playerTookDamage) {
+                const damageApplied = player.takeDamage(damageDealt);
+                if (damageApplied) {
                     this.events.emit(EVENTS.PLAYER_DAMAGED, player.health, player.maxHealth);
+                    if (player.isDead()) {
+                        this.events.emit(EVENTS.PLAYER_DIED);
+                        return; // No need to check further if player is dead
+                    }
                 }
                 this.events.emit(EVENTS.ENEMY_DIED, enemy);
             }

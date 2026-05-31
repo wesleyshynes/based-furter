@@ -104,4 +104,8 @@ export class Player {
 
         return true;
     }
+
+    isDead() {
+        return this.health <= 0;
+    }
 }

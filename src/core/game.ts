@@ -118,6 +118,11 @@ export class Game {
             this.uiManager.updateHealthBar(health, maxHealth);
         });
 
+        this.events.on(EVENTS.PLAYER_DIED, () => {
+            this.events.emit(EVENTS.SOUND, 'game_over');
+            this.gameOver();
+        });
+
         this.uiManager.showPanel('mainMenu');
 
         this.resizeCanvas();
@@ -192,6 +197,12 @@ export class Game {
         this.state = GAME_STATES.MENU;
         this.uiManager.hideHUD();
         this.uiManager.showPanel('mainMenu');
+    }
+
+    gameOver() {
+        this.state = GAME_STATES.GAME_OVER;
+        this.uiManager.hideHUD();
+        this.uiManager.showPanel('gameOverMenu');
     }
 
     resizeCanvas() {

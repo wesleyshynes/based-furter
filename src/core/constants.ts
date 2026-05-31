@@ -13,6 +13,7 @@ export const GAME_STATES = {
     MENU: 'menu',
     PLAYING: 'playing',
     PAUSED: 'paused',
+    GAME_OVER: 'gameOver',
 }
 
 export const ENEMY_DESPAWN_DISTANCE = 50;
