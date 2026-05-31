@@ -8,6 +8,9 @@ import { UIManager } from '../managers/UIManager';
 import { EnemyManager } from '../managers/EnemyManager';
 import { EnemySpawner } from '../managers/EnemySpawner';
 import { EventEmitter } from './eventEmitter';
+import { CollisionSystem } from '../systems/collisionSystem';
+import { CollisionManager } from '../managers/CollisionManager';
+import type { Enemy } from '../entities/enemy';
 
 export class Game {
     private canvas: HTMLDivElement;
@@ -18,6 +21,8 @@ export class Game {
     private uiManager: UIManager;
     private enemyManager: EnemyManager;
     private enemySpawner: EnemySpawner;
+    private collisionSystem: CollisionSystem;
+    private collisionManager: CollisionManager;
 
     private player: Player;
 
@@ -45,6 +50,9 @@ export class Game {
         this.uiManager = new UIManager(this.events);
         this.enemyManager = new EnemyManager();
         this.enemySpawner = new EnemySpawner(this.enemyManager);
+
+        this.collisionSystem = new CollisionSystem();
+        this.collisionManager = new CollisionManager(this.collisionSystem, this.events);
 
         this.renderSystem = new RenderSystem(this.canvas, this.modelManager);
 
@@ -104,6 +112,12 @@ export class Game {
             this.returnToMenu();
         });
 
+        // Player Events
+        this.events.on(EVENTS.PLAYER_DAMAGED, (health: number, maxHealth: number) => {
+            this.events.emit(EVENTS.SOUND, 'player_hurt');
+            this.uiManager.updateHealthBar(health, maxHealth);
+        });
+
         this.uiManager.showPanel('mainMenu');
 
         this.resizeCanvas();
@@ -158,6 +172,7 @@ export class Game {
         this.enemySpawner.reset();
 
         this.lastTime = performance.now();
+        this.uiManager.updateHealthBar(this.player.health, this.player.maxHealth);
     }
 
     pause() {
@@ -207,13 +222,14 @@ export class Game {
             this.uiManager.updateTimer(this.time);
         }
 
-        this.update(dt);
-        this.renderSystem.render(this.state, this.player, this.enemyManager.getActiveEnemies());
+        const activeEnemies = this.enemyManager.getActiveEnemies();
+        this.update(dt, activeEnemies);
+        this.renderSystem.render(this.state, this.player, activeEnemies);
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }
 
-    update(dt: number) {
+    update(dt: number, activeEnemies: Enemy[]) {
         if (this.state !== GAME_STATES.PLAYING) {
             return;
         }
@@ -225,6 +241,7 @@ export class Game {
         this.player.update(dt, this.keys);
         this.enemyManager.update(dt, this.player);
         this.enemySpawner.update(dt);
+        this.collisionManager.update(this.player, activeEnemies);
     }
 
 }

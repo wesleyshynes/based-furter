@@ -13,6 +13,7 @@ export class Enemy {
     angle: number;
 
     radius: number;
+    collisionRadius: number;
     speed: number;
     damage: number;
     health: number;
@@ -37,6 +38,7 @@ export class Enemy {
         this.angle = 0;
 
         this.radius = data.radius;
+        this.collisionRadius = data.collisionRadius;
         this.speed = data.speed;
         this.damage = data.damage;
         this.health = data.health;

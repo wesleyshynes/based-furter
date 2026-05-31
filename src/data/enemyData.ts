@@ -4,6 +4,7 @@ export const enemyData: {
     drifter: {
         type: 'drifter',
         radius: 0.5,
+        collisionRadius: 0.5,
         speed: 2,
         health: 1,
         damage: 1,
@@ -14,6 +15,7 @@ export const enemyData: {
     seeker: {
         type: 'seeker',
         radius: 0.8,
+        collisionRadius: 0.8,
         speed: 3,
         health: 1,
         damage: 1,
@@ -30,6 +32,7 @@ export const enemyData: {
 export interface EnemyDataType {
     type: string;
     radius: number;
+    collisionRadius: number;
     speed: number;
     health: number;
     damage: number;

@@ -6,7 +6,11 @@ export class Player {
     y: number;
     z: number;
 
+    health: number;
+    maxHealth: number;
+
     radius: number;
+    collisionRadius: number;
 
     speed: number;
 
@@ -17,7 +21,11 @@ export class Player {
         this.y = PLAYER_START_COORDS.y;
         this.z = PLAYER_START_COORDS.z;
 
+        this.maxHealth = playerData.maxHealth;
+        this.health = this.maxHealth;
+
         this.radius = playerData.radius;
+        this.collisionRadius = playerData.collisionRadius;
         this.speed = playerData.speed;
         this.angle = 0;
     }
@@ -26,6 +34,7 @@ export class Player {
         this.x = PLAYER_START_COORDS.x;
         this.y = PLAYER_START_COORDS.y;
         this.z = PLAYER_START_COORDS.z;
+        this.health = playerData.maxHealth;
     }
 
     update(dt: number, keys: { [key: string]: boolean }) {
@@ -65,5 +74,10 @@ export class Player {
         // keep player in bounds of the grid
         this.x = Math.max(-GRID_SIZE / 2 + this.radius, Math.min(GRID_SIZE / 2 - this.radius, this.x));
         this.z = Math.max(-GRID_SIZE / 2 + this.radius, Math.min(GRID_SIZE / 2 - this.radius, this.z));
+    }
+
+    takeDamage(amount: number) {
+        this.health = Math.max(0, this.health - amount);
+        return true;
     }
 }
