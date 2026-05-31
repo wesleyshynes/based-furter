@@ -14,7 +14,7 @@ export class RenderSystem {
     private modelManager: ModelManager;
 
     private modelIds: { [key: string]: number };
-
+    private modelState: { [key: string]: any };
     private trackedModels: { [key: string]: boolean };
 
     constructor(canvasElement: HTMLDivElement, modelManager: ModelManager) {
@@ -35,6 +35,7 @@ export class RenderSystem {
         this.modelManager = modelManager;
 
         this.modelIds = {};
+        this.modelState = {};
         this.trackedModels = {};
     }
 
@@ -54,14 +55,36 @@ export class RenderSystem {
         this.renderer.setSize(width, height);
     }
 
+    setModelTransparency(model: THREE.Object3D, transparent: boolean, opacity: number = 1) {
+        model.traverse((child: any) => {
+            if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                if (mesh.material instanceof THREE.Material) {
+                    mesh.material.transparent = transparent;
+                    mesh.material.opacity = opacity;
+                } else if (Array.isArray(mesh.material)) {
+                    mesh.material.forEach((mat) => {
+                        mat.transparent = transparent;
+                        mat.opacity = opacity;
+                    });
+                }
+            }
+        });
+    }
+
     renderPlayer(player: Player) {
 
-        const playerModel = this.modelManager.get('player');
-        if (!this.modelIds['player']) {
-            this.modelIds['player'] = playerModel?.id;
-            if (playerModel) {
-                this.scene.add(playerModel);
-            }
+        const playerModel = this.keyedModel('player', 'player');
+
+        if (player.invincible) {
+            // make the player slightly transparent when invincible
+            const transparencyValue = 0.3 + 0.7 * Math.abs(Math.sin(player.invincibilityTimer * 10)); // oscillate between 0.3 and 1
+            this.setModelTransparency(playerModel!, true, transparencyValue);
+            this.modelState['player'].invincible = true;
+        } else if (!player.invincible && this.modelState['player'].invincible) {
+            // reset to fully opaque when not invincible
+            this.setModelTransparency(playerModel!, false, 1);
+            this.modelState['player'].invincible = false;
         }
 
         // Update player object position based on player data
@@ -72,10 +95,6 @@ export class RenderSystem {
             playerModel.rotation.y += (player.angle - playerModel.rotation.y) * 0.1;
         }
 
-        // move camera to follow the player
-        // this.camera.position.set(player.x, player.y + 5, player.z + 3);
-        // this.camera.lookAt(player.x, player.y, player.z);
-        this.camera.lookAt(0, 0, 8);
     }
 
     renderEnemies(enemies: Enemy[]) {
@@ -98,33 +117,46 @@ export class RenderSystem {
             const model = this.modelManager.get(modelId);
             const modelClone = model ? skeletonClone(model) : null;
             if (modelClone) {
-                this.scene.add(modelClone);
+                this.addToScene(modelClone);
                 this.modelIds[key] = modelClone.id;
+                this.modelState[key] = {};
             }
         }
+        this.trackedModels[key] = true;
         return this.scene.getObjectById(this.modelIds[key]);
-    } 
+    }
+
+    removeKeyedModel(key: string) {
+        const modelId = this.modelIds[key];
+        const model = this.scene.getObjectById(modelId);
+        if (model) {
+            this.removeFromScene(model);
+        }
+        delete this.modelIds[key];
+        delete this.modelState[key];
+        delete this.trackedModels[key];
+    }
 
     render(state: string, player: Player, enemies: Enemy[] = []) {
 
         if (state !== GAME_STATES.PLAYING) {
             this.renderer.render(this.pauseScene, this.camera);
         } else {
+
             this.renderPlayer(player);
             this.renderEnemies(enemies);
+
             Object.keys(this.trackedModels).forEach(key => {
                 if (!this.trackedModels[key]) {
-                    const modelId = this.modelIds[key];
-                    const model = this.scene.getObjectById(modelId);
-                    if (model) {
-                        this.scene.remove(model);
-                    }
-                    delete this.modelIds[key];
+                    this.removeKeyedModel(key);
                     return
                 }
                 // reset tracking for next frame
                 this.trackedModels[key] = false;
             });
+
+            this.camera.lookAt(0, 0, 8);
+
             this.renderer.render(this.scene, this.camera);
         }
 

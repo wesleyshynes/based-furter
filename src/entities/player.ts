@@ -9,6 +9,10 @@ export class Player {
     health: number;
     maxHealth: number;
 
+    invincible: boolean;
+    invincibilityTimer: number;
+    invincibilityDuration: number; // seconds
+
     radius: number;
     collisionRadius: number;
 
@@ -24,6 +28,10 @@ export class Player {
         this.maxHealth = playerData.maxHealth;
         this.health = this.maxHealth;
 
+        this.invincible = false;
+        this.invincibilityTimer = 0;
+        this.invincibilityDuration = playerData.invincibilityDuration;
+
         this.radius = playerData.radius;
         this.collisionRadius = playerData.collisionRadius;
         this.speed = playerData.speed;
@@ -35,9 +43,19 @@ export class Player {
         this.y = PLAYER_START_COORDS.y;
         this.z = PLAYER_START_COORDS.z;
         this.health = playerData.maxHealth;
+        this.invincible = false;
+        this.invincibilityTimer = 0;
+        this.angle = 0;
     }
 
     update(dt: number, keys: { [key: string]: boolean }) {
+        if (this.invincible) {
+            this.invincibilityTimer -= dt;
+            if (this.invincibilityTimer <= 0) {
+                this.invincible = false;
+                this.invincibilityTimer = 0;
+            }
+        }
 
         let dx = 0, dy = 0, dz = 0;
         if (keys['w'] || keys['arrowup']) {
@@ -77,7 +95,13 @@ export class Player {
     }
 
     takeDamage(amount: number) {
+        if (this.invincible) return false;
+
         this.health = Math.max(0, this.health - amount);
+
+        this.invincible = true;
+        this.invincibilityTimer = this.invincibilityDuration;
+
         return true;
     }
 }
