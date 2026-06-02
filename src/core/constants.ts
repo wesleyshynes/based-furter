@@ -34,4 +34,4 @@ export const EVENTS = {
     // Enemy
     ENEMY_DAMAGED: 'enemy:damaged',
     ENEMY_DIED: 'enemy:died',
-}
+    }

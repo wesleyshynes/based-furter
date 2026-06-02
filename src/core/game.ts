@@ -88,6 +88,8 @@ export class Game {
 
     async init() {
 
+        this.uiManager.hideDebug();
+
         await Promise.all([
             this.modelManager.loadAll(),
             this.audioManager.loadAll(),

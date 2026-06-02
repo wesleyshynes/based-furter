@@ -11,6 +11,17 @@ body {
     color: #ffffff;
 }
 
+#debugInfoEl {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(255, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 10000;
+}
+
 #gameContainer {
     display: flex;
     justify-content: center;
@@ -29,6 +40,10 @@ body {
 
 #loadingScreen {
     padding: 40px;
+}
+
+#initializeContainer {
+    display: block;
 }
 
 .ui-panel {

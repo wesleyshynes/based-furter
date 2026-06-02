@@ -20,6 +20,8 @@ export class UIManager {
     private playAgainBtnEl: HTMLElement | null;
     private quitFromGameOverBtnEl: HTMLElement | null;
 
+    private debugInfoEl: HTMLElement | null;
+
     constructor(events: EventEmitter) {
         this.events = events;
 
@@ -41,7 +43,28 @@ export class UIManager {
         this.playAgainBtnEl = document.getElementById('playAgainBtn');
         this.quitFromGameOverBtnEl = document.getElementById('quitFromGameOverBtn');
 
+        // Debug info
+        this.debugInfoEl = document.getElementById('debugInfoEl');
+
         this.setupEventListeners();
+    }
+
+    logDebug(message: string) {
+        console.log(message);
+        if (this.debugInfoEl) {
+            this.showDebug();
+            this.debugInfoEl.textContent = message;
+        }
+    }
+    showDebug() {
+        if (this.debugInfoEl) {
+            this.debugInfoEl.style.display = 'block';
+        }
+    }
+    hideDebug() {
+        if (this.debugInfoEl) {
+            this.debugInfoEl.style.display = 'none';
+        }
     }
 
     setupEventListeners() {
