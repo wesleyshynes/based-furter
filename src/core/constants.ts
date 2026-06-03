@@ -1,8 +1,8 @@
-export const GAME_WIDTH = 600;
-export const GAME_HEIGHT = 800;
+export const GAME_WIDTH = 800;
+export const GAME_HEIGHT = 600;
 export const GAME_MARGIN = 15;
 
-export const ASPECT_RATIO = 3 / 4;
+export const ASPECT_RATIO = GAME_WIDTH / GAME_HEIGHT;
 
 export const GRID_SIZE = 40;
 export const GRID_DIVISIONS = 40;
