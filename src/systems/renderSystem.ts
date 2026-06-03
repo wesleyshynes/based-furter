@@ -87,6 +87,39 @@ export class RenderSystem {
             this.modelState['player'].invincible = false;
         }
 
+        if (player.redMode && !this.modelState['player'].redMode) {
+            this.modelState['player'].redMode = true;
+            const originalMaterial: { [meshuuid: string]: THREE.Material | THREE.Material[] } = {};
+            playerModel?.traverse((child: any) => {
+                if ((child as THREE.Mesh).isMesh) {
+                    const mesh = child as THREE.Mesh;
+                    originalMaterial[mesh.uuid] = mesh.material;
+                    if (mesh.material instanceof THREE.Material) {
+                        mesh.material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+                    } else if (Array.isArray(mesh.material)) {
+                        mesh.material = mesh.material.map(() => new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+                    }
+                }
+            });
+            this.modelState['player'].originalMaterial = originalMaterial;
+            // make the player red when in red mode
+            
+        } else if (!player.redMode && this.modelState['player'].redMode) {
+            this.modelState['player'].redMode = false;
+
+            // reset to original material when not in red mode
+            playerModel?.traverse((child: any) => {
+                if ((child as THREE.Mesh).isMesh) {
+                    const mesh = child as THREE.Mesh;
+                    const originalMat = this.modelState['player'].originalMaterial[mesh.uuid];
+                    if (originalMat) {
+                        mesh.material = originalMat;
+                    }
+                }
+            });
+            
+        }
+
         // Update player object position based on player data
         playerModel?.position.set(player.x, player.y, player.z);
 

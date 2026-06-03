@@ -13,6 +13,8 @@ export class Player {
     invincibilityTimer: number;
     invincibilityDuration: number; // seconds
 
+    redMode: boolean;
+
     radius: number;
     collisionRadius: number;
 
@@ -32,6 +34,8 @@ export class Player {
         this.invincibilityTimer = 0;
         this.invincibilityDuration = playerData.invincibilityDuration;
 
+        this.redMode = false;
+
         this.radius = playerData.radius;
         this.collisionRadius = playerData.collisionRadius;
         this.speed = playerData.speed;
@@ -46,9 +50,17 @@ export class Player {
         this.invincible = false;
         this.invincibilityTimer = 0;
         this.angle = 0;
+        this.redMode = false;
     }
 
-    update(dt: number, keys: { [key: string]: boolean }) {
+    update(dt: number, input: {
+        keys: { [key: string]: boolean }
+        direction: { x: number, z: number }
+    }) {
+
+        const keys = input.keys;
+        const direction = input.direction;
+
         if (this.invincible) {
             this.invincibilityTimer -= dt;
             if (this.invincibilityTimer <= 0) {
@@ -69,6 +81,17 @@ export class Player {
         }
         if (keys['d'] || keys['arrowright']) {
             dx += this.speed;
+        }
+
+        if (direction.x !== 0 || direction.z !== 0) {
+            dx += direction.x * this.speed;
+            dz -= direction.z * this.speed;
+        }
+
+        if (keys[' ']) {
+            this.redMode = true;
+        } else {
+            this.redMode = false;
         }
 
         // Normalize diagonal movement

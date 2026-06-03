@@ -11,6 +11,7 @@ import { EventEmitter } from './eventEmitter';
 import { CollisionSystem } from '../systems/collisionSystem';
 import { CollisionManager } from '../managers/CollisionManager';
 import type { Enemy } from '../entities/enemy';
+import { InputManager } from '../managers/InputManager';
 
 export class Game {
     private canvas: HTMLDivElement;
@@ -24,6 +25,8 @@ export class Game {
     private collisionSystem: CollisionSystem;
     private collisionManager: CollisionManager;
 
+    private inputManager: InputManager;
+
     private player: Player;
 
     private cube: THREE.Mesh;
@@ -31,7 +34,7 @@ export class Game {
 
     private renderSystem: RenderSystem;
 
-    private keys: { [key: string]: boolean };
+    // private keys: { [key: string]: boolean };
 
     private lastTime: number;
     private time: number;
@@ -78,7 +81,19 @@ export class Game {
         this.renderSystem.addToScene(gridHelper);
 
         // Initialize input state        
-        this.keys = {};
+        // this.keys = {};
+        const joystickElement = document.getElementById('joystick') as HTMLElement;
+        const actionButtonElement = document.getElementById('action-btn') as HTMLElement;
+        this.inputManager = new InputManager(joystickElement, actionButtonElement, (event) => {
+            // Handle key down events
+            if (event.key === 'Escape') {
+                if (this.state === GAME_STATES.PLAYING) {
+                    this.pause();
+                } else if (this.state === GAME_STATES.PAUSED) {
+                    this.resume();
+                }
+            }
+        });
 
         this.lastTime = 0;
         this.time = 0
@@ -129,40 +144,10 @@ export class Game {
 
         this.resizeCanvas();
         window.addEventListener('resize', () => { this.resizeCanvas() });
-        this.setupInput();
+        this.inputManager.initialize();
         this.uiManager.setupEventListeners();
 
         requestAnimationFrame((t) => this.gameLoop(t));
-    }
-
-    setupInput() {
-        window.addEventListener('keydown', (event) => {
-            this.keys[event.key.toLowerCase()] = true;
-
-            if (event.key === 'Escape') {
-                if (this.state === GAME_STATES.PLAYING) {
-                    this.pause();
-                } else if (this.state === GAME_STATES.PAUSED) {
-                    this.resume();
-                }
-            }
-
-            // if space and not in menu span an enemy within 4 units of the player
-            if (event.key === ' ' && this.state !== GAME_STATES.MENU) {
-                this.enemySpawner.spawnWave();
-            }
-        });
-        window.addEventListener('keyup', (event) => {
-            this.keys[event.key.toLowerCase()] = false;
-        });
-        // Clear all keys when context menu is opened (e.g. right-click)
-        window.addEventListener('contextmenu', () => {
-            this.keys = {};
-        });
-        // Clear all keys when window loses focus
-        window.addEventListener('blur', () => {
-            this.keys = {};
-        });
     }
 
     startGame() {
@@ -251,7 +236,7 @@ export class Game {
         this.cube.rotation.x += 1 * dt;
         this.cube.rotation.y += 1 * dt;
 
-        this.player.update(dt, this.keys);
+        this.player.update(dt, this.inputManager.getInputState());
         this.enemyManager.update(dt, this.player);
         this.enemySpawner.update(dt);
         this.collisionManager.update(this.player, activeEnemies);

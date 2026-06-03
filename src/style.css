@@ -160,3 +160,44 @@ button:hover {
     font-weight: bold;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
+
+/* Controls */
+#touch-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  width: 80%;
+}
+.touch-button {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+#directional-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-right: auto;
+  margin-bottom: 40px;
+  margin-left: 20px;
+}
+#joystick {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+}
+#directional-btns .directional-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
