@@ -1,4 +1,5 @@
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import * as THREE from 'three';
 import { enemyData } from "../data/enemyData";
 import { playerData } from "../data/playerData";
@@ -8,7 +9,57 @@ export class ModelManager {
     constructor() {
         this.models = {};
     }
-    load(name: string, url: string, options: any = {
+
+    loadFbx(name: string, url: string, options: any = {
+        scale: 1,
+    }) {
+        // crete a placeholder sphere model while the actual model is loading
+        const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const placeholderModel = new THREE.Mesh(geometry, material);
+        placeholderModel.position.set(0, 1, 0);
+        placeholderModel.castShadow = true;
+
+        const loader = new FBXLoader();
+
+        this.models[name] = {
+            model: placeholderModel,
+            loaded: false,
+            error: null,
+        }
+
+        return new Promise<void>((resolve) => {
+            loader.load(url, (fbx) => {
+                const model = fbx;
+                model.position.set(0, 1, 0);
+                model.scale.set(options.scale, options.scale, options.scale);
+                model.castShadow = true;
+                model.traverse((child) => {
+                    if ((child as THREE.Mesh).isMesh) {
+                        (child as THREE.Mesh).castShadow = true;
+                    }
+                });
+
+                this.models[name] = {
+                    model: model,
+                    loaded: true,
+                    error: null,
+                }
+                resolve();
+            }, undefined, (error) => {
+                console.error(`Error loading model ${name} from ${url}:`, error);
+                this.models[name] = {
+                    model: placeholderModel,
+                    loaded: false,
+                    error: error,
+                };
+                resolve();
+            });
+        });    
+    }
+
+
+    loadGlb(name: string, url: string, options: any = {
         scale: 1,
     }) {
 
@@ -105,7 +156,13 @@ export class ModelManager {
             }
         });
 
-        await Promise.all(modelsToLoad.map(({ name, url, options }) => this.load(name, url, options)));
+        await Promise.all(modelsToLoad.map(({ name, url, options }) => {
+            if (url.endsWith('.glb')) {
+                return this.loadGlb(name, url, options);
+            } else if (url.endsWith('.fbx')) {
+                return this.loadFbx(name, url, options);
+            }
+        }));
         spheresToLoad.forEach(({ name, radius, color }) => this.loadSphere(name, radius, color));
     }
 }

@@ -1,4 +1,5 @@
 import Animated_Robot from '../assets/models/glb/Animated_Robot.glb';
+import Low_Poly_Person from '../assets/models/fbx/low-poly-person.fbx';
 
 export const playerData = {
     maxHealth: 12,
@@ -7,8 +8,10 @@ export const playerData = {
     collisionRadius: 0.5,
     invincibilityDuration: 2, // seconds
 
-    model: Animated_Robot,
+    model: Low_Poly_Person,
+    // model: Animated_Robot,
     modelOptions: {
-        scale: 0.5,
+        scale: 0.02,
+        // scale: 0.5,
     }
 }

@@ -62,10 +62,12 @@ export class RenderSystem {
                 if (mesh.material instanceof THREE.Material) {
                     mesh.material.transparent = transparent;
                     mesh.material.opacity = opacity;
+                    mesh.material.needsUpdate = true; // ensure material updates
                 } else if (Array.isArray(mesh.material)) {
                     mesh.material.forEach((mat) => {
                         mat.transparent = transparent;
                         mat.opacity = opacity;
+                        mat.needsUpdate = true; // ensure material updates
                     });
                 }
             }
