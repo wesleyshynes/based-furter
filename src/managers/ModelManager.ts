@@ -24,6 +24,7 @@ export class ModelManager {
 
         this.models[name] = {
             model: placeholderModel,
+            animations: [],
             loaded: false,
             error: null,
         }
@@ -42,6 +43,7 @@ export class ModelManager {
 
                 this.models[name] = {
                     model: model,
+                    animations: [], // FBXLoader doesn't support animations in the same way as GLTFLoader
                     loaded: true,
                     error: null,
                 }
@@ -50,6 +52,7 @@ export class ModelManager {
                 console.error(`Error loading model ${name} from ${url}:`, error);
                 this.models[name] = {
                     model: placeholderModel,
+                    animations: [],
                     loaded: false,
                     error: error,
                 };
@@ -74,6 +77,7 @@ export class ModelManager {
 
         this.models[name] = {
             model: placeholderModel,
+            animations: [],
             loaded: false,
             error: null,
         }
@@ -82,6 +86,8 @@ export class ModelManager {
             loader.load(url, (gltf: GLTF) => {
                 const model = gltf.scene;
                 // const model = gltf.scene.children[0];
+                console.log(`GLTF model ${name} loaded:`, gltf);
+
                 model.position.set(0, 1, 0);
                 model.scale.set(options.scale, options.scale, options.scale);
                 model.castShadow = true;
@@ -94,6 +100,7 @@ export class ModelManager {
 
                 this.models[name] = {
                     model: model,
+                    animations: gltf.animations,
                     loaded: true,
                     error: null,
                 }
@@ -103,6 +110,7 @@ export class ModelManager {
                 console.error(`Error loading model ${name} from ${url}:`, error);
                 this.models[name] = {
                     model: placeholderModel,
+                    animations: [],
                     loaded: false,
                     error: error,
                 };
@@ -128,13 +136,15 @@ export class ModelManager {
 
         this.models[name] = {
             model: model,
+            animations: [],
             loaded: true,
             error: null,
         }
     }
 
     get(name: string) {
-        return this.models[name]?.model || null;
+        return this.models[name] || null;
+        // return this.models[name]?.model || null;
     }
 
     async loadAll() {

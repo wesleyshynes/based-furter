@@ -222,7 +222,7 @@ export class Game {
 
         const activeEnemies = this.enemyManager.getActiveEnemies();
         this.update(dt, activeEnemies);
-        this.renderSystem.render(this.state, this.player, activeEnemies);
+        this.renderSystem.render(dt, this.state, this.player, activeEnemies);
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }

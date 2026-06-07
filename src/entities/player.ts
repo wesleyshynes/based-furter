@@ -19,6 +19,7 @@ export class Player {
     collisionRadius: number;
 
     speed: number;
+    moving: boolean;
 
     angle: number;
 
@@ -39,6 +40,7 @@ export class Player {
         this.radius = playerData.radius;
         this.collisionRadius = playerData.collisionRadius;
         this.speed = playerData.speed;
+        this.moving = false;
         this.angle = 0;
     }
 
@@ -110,6 +112,9 @@ export class Player {
         // set the angle based on movement direction
         if (dx !== 0 || dz !== 0) {
             this.angle = Math.atan2(dx, dz);
+            this.moving = true;
+        } else {
+            this.moving = false;
         }
 
         // keep player in bounds of the grid

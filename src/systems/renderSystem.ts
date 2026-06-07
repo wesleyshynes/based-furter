@@ -4,6 +4,7 @@ import { GAME_HEIGHT, GAME_STATES, GAME_WIDTH } from '../core/constants';
 import type { Player } from '../entities/player';
 import type { ModelManager } from '../managers/ModelManager';
 import type { Enemy } from '../entities/enemy';
+import { AnimationManager } from '../managers/AnimationManager';
 
 export class RenderSystem {
     private canvas: HTMLDivElement;
@@ -14,6 +15,7 @@ export class RenderSystem {
     private modelManager: ModelManager;
 
     private modelIds: { [key: string]: number };
+    private modelAnimations: { [key: string]: AnimationManager };
     private modelState: { [key: string]: any };
     private trackedModels: { [key: string]: boolean };
 
@@ -35,6 +37,7 @@ export class RenderSystem {
         this.modelManager = modelManager;
 
         this.modelIds = {};
+        this.modelAnimations = {};
         this.modelState = {};
         this.trackedModels = {};
     }
@@ -74,7 +77,7 @@ export class RenderSystem {
         });
     }
 
-    renderPlayer(player: Player) {
+    renderPlayer(dt: number, player: Player) {
 
         const playerModel = this.keyedModel('player', 'player');
 
@@ -125,6 +128,13 @@ export class RenderSystem {
         // Update player object position based on player data
         playerModel?.position.set(player.x, player.y, player.z);
 
+        if (player.moving) {
+            this.modelAnimations['player']?.play('Walking');
+        } else {
+            this.modelAnimations['player']?.play('Idle');
+        }
+        this.modelAnimations['player']?.update(dt);
+
         // rotate player model based on angle smoothly
         if (playerModel) {
             playerModel.rotation.y += (player.angle - playerModel.rotation.y) * 0.1;
@@ -149,13 +159,25 @@ export class RenderSystem {
 
     keyedModel(key: string, modelId: string) {
         if (!this.modelIds[key]) {
-            const model = this.modelManager.get(modelId);
+            const modelInfo = this.modelManager.get(modelId);
+            const model = modelInfo?.model || null;
+            // show model animations
+            console.log(`Model ${modelId} loaded:`, model);
             const modelClone = model ? skeletonClone(model) : null;
             if (modelClone) {
                 this.addToScene(modelClone);
                 this.modelIds[key] = modelClone.id;
                 this.modelState[key] = {};
+
+                const animationController = new AnimationManager(modelClone);
+                const animations = modelInfo?.animations || [];
+                animations.forEach((clip: any) => {
+                    animationController.addClip(clip.name, clip);
+                });
+                this.modelAnimations[key] = animationController;
             }
+            // show animations in console
+            console.log(`Model ${modelId} clone:`, modelClone);
         }
         this.trackedModels[key] = true;
         return this.scene.getObjectById(this.modelIds[key]);
@@ -170,15 +192,16 @@ export class RenderSystem {
         delete this.modelIds[key];
         delete this.modelState[key];
         delete this.trackedModels[key];
+        delete this.modelAnimations[key];
     }
 
-    render(state: string, player: Player, enemies: Enemy[] = []) {
+    render(dt: number, state: string, player: Player, enemies: Enemy[] = []) {
 
         if (state !== GAME_STATES.PLAYING) {
             this.renderer.render(this.pauseScene, this.camera);
         } else {
 
-            this.renderPlayer(player);
+            this.renderPlayer(dt, player);
             this.renderEnemies(enemies);
 
             Object.keys(this.trackedModels).forEach(key => {
