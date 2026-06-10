@@ -31,4 +31,4 @@ function startGame() {
 
 startGame();
 
-// last vid https://www.youtube.com/watch?v=jBro2CYVaRU
+// current vid https://www.youtube.com/watch?v=dATpriw6eHA&t=11s. 14 MINUTE MARK

@@ -25,7 +25,7 @@
     <!-- Main Menu -->
     <div id="mainMenu" class="ui-panel">
       <h1>Tree Dee</h1>
-      <button id="playBtn">Play</button>
+      <button data-action="start">Play</button>
       <div style="margin-top: 20px;font-size: 12px;">
         <h2>Controls</h2>
         <p>WASD - Move</p>
@@ -36,8 +36,8 @@
     <!-- Pause Menu -->
     <div id="pauseMenu" class="ui-panel">
       <h2>Paused</h2>
-      <button id="resumeBtn">Resume</button>
-      <button id="quitBtn">Quit to Menu</button>
+      <button data-action="resume">Resume</button>
+      <button data-action="returnToMenu">Quit to Menu</button>
     </div>
 
     <!-- Loading Screen -->
@@ -49,8 +49,15 @@
     <!-- Game Over Screen -->
     <div id="gameOverMenu" class="ui-panel">
       <h1>Game Over</h1>
-      <button id="playAgainBtn">Play Again</button>
-      <button id="quitFromGameOverBtn">Main Menu</button>
+      <button data-action="start">Play Again</button>
+      <button data-action="returnToMenu">Main Menu</button>
+    </div>
+
+    <!-- Mission Complete Screen -->
+    <div id="missionCompleteMenu" class="ui-panel">
+      <h1>Mission Complete</h1>
+      <button data-action="start">Play Again</button>
+      <button data-action="returnToMenu">Main Menu</button>
     </div>
 
     <div id="initializeContainer" class="ui-panel">

@@ -14,6 +14,7 @@ export const GAME_STATES = {
     PLAYING: 'playing',
     PAUSED: 'paused',
     GAME_OVER: 'gameOver',
+    MISSION_COMPLETE: 'missionComplete'
 }
 
 export const ENEMY_DESPAWN_DISTANCE = 50;
@@ -28,10 +29,12 @@ export const EVENTS = {
     GAME_PAUSE: 'game:pause',
     GAME_RESUME: 'game:resume',
     GAME_RETURN_TO_MENU: 'game:returnToMenu',
+    MISSION_COMPLETE: 'game:missionComplete',
     // Player
     PLAYER_DAMAGED: 'player:damaged',
     PLAYER_DIED: 'player:died',
     // Enemy
     ENEMY_DAMAGED: 'enemy:damaged',
     ENEMY_DIED: 'enemy:died',
-    }
+    ENEMY_KILLED_COUNT: 'enemy:killedCount',
+}

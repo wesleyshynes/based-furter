@@ -12,6 +12,7 @@ import { CollisionSystem } from '../systems/collisionSystem';
 import { CollisionManager } from '../managers/CollisionManager';
 import type { Enemy } from '../entities/enemy';
 import { InputManager } from '../managers/InputManager';
+import { missionData } from '../data/playerData';
 
 export class Game {
     private canvas: HTMLDivElement;
@@ -38,6 +39,8 @@ export class Game {
 
     private lastTime: number;
     private time: number;
+
+    private enemiesKilled: number;
 
     private state: string;
 
@@ -98,6 +101,8 @@ export class Game {
         this.lastTime = 0;
         this.time = 0
 
+        this.enemiesKilled = 0;
+
         this.init();
     }
 
@@ -128,6 +133,9 @@ export class Game {
         this.events.on(EVENTS.GAME_RETURN_TO_MENU, () => {
             this.returnToMenu();
         });
+        this.events.on(EVENTS.MISSION_COMPLETE, () => {
+            this.missionComplete();
+        });
 
         // Player Events
         this.events.on(EVENTS.PLAYER_DAMAGED, (health: number, maxHealth: number) => {
@@ -138,6 +146,12 @@ export class Game {
         this.events.on(EVENTS.PLAYER_DIED, () => {
             this.events.emit(EVENTS.SOUND, 'game_over');
             this.gameOver();
+        });
+
+        this.events.on(EVENTS.ENEMY_DIED, () => {
+            this.enemiesKilled++;
+            this.events.emit(EVENTS.ENEMY_KILLED_COUNT, this.enemiesKilled);
+            this.checkMissionConditions();
         });
 
         this.uiManager.showPanel('mainMenu');
@@ -155,6 +169,7 @@ export class Game {
         this.state = GAME_STATES.PLAYING;
         this.uiManager.hideAllPanels();
         this.time = 0;
+        this.enemiesKilled = 0;
         this.uiManager.showHUD();
 
         // reset player position and state
@@ -218,6 +233,7 @@ export class Game {
         if (this.state === GAME_STATES.PLAYING) {
             this.time += dt;
             this.uiManager.updateTimer(this.time);
+            this.checkMissionConditions();
         }
 
         const activeEnemies = this.enemyManager.getActiveEnemies();
@@ -240,6 +256,24 @@ export class Game {
         this.enemyManager.update(dt, this.player);
         this.enemySpawner.update(dt);
         this.collisionManager.update(this.player, activeEnemies);
+    }
+
+    checkMissionConditions() {
+        if (this.state !== GAME_STATES.PLAYING) {
+            return;
+        }
+
+        // Example mission condition: Kill 10 enemies or survive for 60 seconds
+        if (this.enemiesKilled >= missionData.killCount || this.time >= missionData.surviveTime) {
+            this.events.emit(EVENTS.MISSION_COMPLETE);
+        }
+    }
+
+    missionComplete() {
+        this.state = GAME_STATES.MISSION_COMPLETE;
+        this.uiManager.hideHUD();
+        this.uiManager.showPanel('missionCompleteMenu');
+        this.events.emit(EVENTS.SOUND, 'mission_complete');
     }
 
 }

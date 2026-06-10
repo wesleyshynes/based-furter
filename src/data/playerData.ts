@@ -13,8 +13,13 @@ export const playerData = {
     // model: Low_Poly_Person,
     // model: Animated_Robot,
     modelOptions: {
-        scale: 3,
+        scale: 2,
         // scale: 0.02,
         // scale: 0.5,
     }
+}
+
+export const missionData = {
+    killCount: 10,
+    surviveTime: 60, // seconds
 }

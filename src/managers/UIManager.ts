@@ -13,12 +13,7 @@ export class UIManager {
     private pauseMenuEl: HTMLElement | null;
     private loadingScreenEl: HTMLElement | null;
     private gameOverMenuEl: HTMLElement | null;
-
-    private playBtnEl: HTMLElement | null;
-    private resumeBtnEl: HTMLElement | null;
-    private quitBtnEl: HTMLElement | null;
-    private playAgainBtnEl: HTMLElement | null;
-    private quitFromGameOverBtnEl: HTMLElement | null;
+    private missionCompleteMenuEl: HTMLElement | null;
 
     private debugInfoEl: HTMLElement | null;
 
@@ -35,13 +30,7 @@ export class UIManager {
         this.pauseMenuEl = document.getElementById('pauseMenu');
         this.loadingScreenEl = document.getElementById('loadingScreen');
         this.gameOverMenuEl = document.getElementById('gameOverMenu');
-
-        // Buttons
-        this.playBtnEl = document.getElementById('playBtn');
-        this.resumeBtnEl = document.getElementById('resumeBtn');
-        this.quitBtnEl = document.getElementById('quitBtn');
-        this.playAgainBtnEl = document.getElementById('playAgainBtn');
-        this.quitFromGameOverBtnEl = document.getElementById('quitFromGameOverBtn');
+        this.missionCompleteMenuEl = document.getElementById('missionCompleteMenu');
 
         // Debug info
         this.debugInfoEl = document.getElementById('debugInfoEl');
@@ -68,37 +57,27 @@ export class UIManager {
     }
 
     setupEventListeners() {
-        // startGame when playBtn is clicked
-        this.playBtnEl?.addEventListener('click', () => {
-            this.events.emit(EVENTS.GAME_START);
+
+        document.querySelectorAll('[data-action="start"]').forEach(button => {
+            button.addEventListener('click', () => {
+                this.events.emit(EVENTS.GAME_START);
+            });
         });
-        // resume game when resumeBtn is clicked
-        this.resumeBtnEl?.addEventListener('click', () => {
-            this.events.emit(EVENTS.GAME_RESUME);
-        });
-        // quitToMenu when quitBtn is clicked
-        this.quitBtnEl?.addEventListener('click', () => {
-            this.events.emit(EVENTS.GAME_RETURN_TO_MENU);
-        });
-        // play again when playAgainBtn is clicked
-        this.playAgainBtnEl?.addEventListener('click', () => {
-            this.events.emit(EVENTS.GAME_START);
-        });
-        // quit to menu when quitFromGameOverBtn is clicked
-        this.quitFromGameOverBtnEl?.addEventListener('click', () => {
-            this.events.emit(EVENTS.GAME_RETURN_TO_MENU);
+        
+        document.querySelectorAll('[data-action="resume"]').forEach(button => {
+            button.addEventListener('click', () => {
+                this.events.emit(EVENTS.GAME_RESUME);
+            });
         });
 
-        // add hover sound effect to all buttons
-        [
-            this.playBtnEl,
-            this.resumeBtnEl,
-            this.quitBtnEl,
-            this.playAgainBtnEl,
-            this.quitFromGameOverBtnEl,
-        ].forEach(button => {
-            button?.addEventListener('mouseenter', () => {
-                // this.game.playSound('button_hover');
+        document.querySelectorAll('[data-action="returnToMenu"]').forEach(button => {
+            button.addEventListener('click', () => {
+                this.events.emit(EVENTS.GAME_RETURN_TO_MENU);
+            });
+        });
+
+        document.querySelectorAll('[data-action]').forEach(button => {
+            button.addEventListener('mouseenter', () => {
                 this.events.emit(EVENTS.SOUND, 'button_hover');
             });
         });
@@ -110,6 +89,7 @@ export class UIManager {
             this.pauseMenuEl,
             this.loadingScreenEl,
             this.gameOverMenuEl,
+            this.missionCompleteMenuEl
         ].forEach(panel => panel?.classList.remove('active'));
     }
 
