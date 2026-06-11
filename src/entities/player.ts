@@ -17,6 +17,7 @@ export class Player {
 
     radius: number;
     collisionRadius: number;
+    collisionDamage: number;
 
     speed: number;
     moving: boolean;
@@ -39,6 +40,7 @@ export class Player {
 
         this.radius = playerData.radius;
         this.collisionRadius = playerData.collisionRadius;
+        this.collisionDamage = playerData.collisionDamage;
         this.speed = playerData.speed;
         this.moving = false;
         this.angle = 0;

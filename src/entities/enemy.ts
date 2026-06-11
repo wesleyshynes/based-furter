@@ -1,4 +1,4 @@
-import { ENEMY_DESPAWN_DISTANCE } from "../core/constants";
+import { ENEMY_DESPAWN_DISTANCE, ENEMY_HIT_INVINCIBILITY_DURATION } from "../core/constants";
 import type { EnemyDataType } from "../data/enemyData";
 import type { BehaviorType } from "./behaviors/behaviorType";
 
@@ -20,6 +20,8 @@ export class Enemy {
     color: number;
 
     active: boolean;
+    invincible: boolean;
+    invincibilityTimer: number;
 
     private data: EnemyDataType;
     private behavior: BehaviorType;
@@ -45,6 +47,8 @@ export class Enemy {
         this.color = data.color;
 
         this.active = false;
+        this.invincible = false;
+        this.invincibilityTimer = 0;
     }
 
     spawn(x: number, z: number) {
@@ -63,6 +67,14 @@ export class Enemy {
     update(dt: number, player: { x: number; y: number; z: number }) {
         if (!this.active) return;
 
+        if (this.invincible) {
+            this.invincibilityTimer -= dt;
+            if (this.invincibilityTimer <= 0) {
+                this.invincible = false;
+                this.invincibilityTimer = 0;
+            }
+        }
+
         const dx = player.x - this.x;
         const dz = player.z - this.z;
         const len = Math.sqrt(dx * dx + dz * dz);
@@ -74,5 +86,20 @@ export class Enemy {
         }
 
         this.behavior.update(this, dt, player);
+    }
+
+    takeDamage(amount: number) {
+        if (this.invincible) return false;
+
+        this.health = Math.max(0, this.health - amount);
+
+        this.invincible = true;
+        this.invincibilityTimer = ENEMY_HIT_INVINCIBILITY_DURATION;
+
+        return true;
+    }
+
+    isDead() {
+        return this.health <= 0;
     }
 }

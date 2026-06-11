@@ -6,6 +6,16 @@ import type { ModelManager } from '../managers/ModelManager';
 import type { Enemy } from '../entities/enemy';
 import { AnimationManager } from '../managers/AnimationManager';
 
+const FLASH_MIN_ALPHA = 0.3;
+const FLASH_ALPHA_RANGE = 0.7;
+const FLASH_SPEED = 10;
+
+const HEALTH_BAR_HEIGHT = 0.2;
+const HEALTH_BAR_OFFSET = 0.5;
+
+const HEALTH_BAR_BG = 'rgba(0, 0, 0, 0.6)';
+const HEALTH_BAR_FILL = 'rgba(255, 0, 0, 0.6)';
+
 export class RenderSystem {
     private canvas: HTMLDivElement;
     private renderer: THREE.WebGLRenderer;
@@ -83,7 +93,7 @@ export class RenderSystem {
 
         if (player.invincible) {
             // make the player slightly transparent when invincible
-            const transparencyValue = 0.3 + 0.7 * Math.abs(Math.sin(player.invincibilityTimer * 10)); // oscillate between 0.3 and 1
+            const transparencyValue = FLASH_MIN_ALPHA + FLASH_ALPHA_RANGE * Math.abs(Math.sin(player.invincibilityTimer * FLASH_SPEED)); // oscillate between 0.3 and 1
             this.setModelTransparency(playerModel!, true, transparencyValue);
             this.modelState['player'].invincible = true;
         } else if (!player.invincible && this.modelState['player'].invincible) {
@@ -108,7 +118,7 @@ export class RenderSystem {
             });
             this.modelState['player'].originalMaterial = originalMaterial;
             // make the player red when in red mode
-            
+
         } else if (!player.redMode && this.modelState['player'].redMode) {
             this.modelState['player'].redMode = false;
 
@@ -122,7 +132,7 @@ export class RenderSystem {
                     }
                 }
             });
-            
+
         }
 
         // Update player object position based on player data
@@ -147,6 +157,19 @@ export class RenderSystem {
             const enemy = enemies[i];
             const enemyId = `enemy_${enemy.type}_${enemy.id}`;
             const enemyModel = this.keyedModel(enemyId, `enemy_${enemy.type}`);
+
+            if (enemy.invincible) {
+                console.log(`Enemy ${enemyId} is invincible with timer: ${enemy.invincibilityTimer}`);
+                // make the enemy slightly transparent when invincible
+                const transparencyValue = FLASH_MIN_ALPHA + FLASH_ALPHA_RANGE * Math.abs(Math.sin(enemy.invincibilityTimer * FLASH_SPEED)); // oscillate between 0.3 and 1
+                this.setModelTransparency(enemyModel!, true, transparencyValue);
+                this.modelState[enemyId].invincible = true;
+            } else if (!enemy.invincible && this.modelState[enemyId].invincible) {
+                // reset to fully opaque when not invincible
+                this.setModelTransparency(enemyModel!, false, 1);
+                this.modelState[enemyId].invincible = false;
+            }
+
             // Update enemy object position based on enemy data
             enemyModel?.position.set(enemy.x, enemy.y, enemy.z);
             this.trackedModels[enemyId] = true;
@@ -177,7 +200,7 @@ export class RenderSystem {
                 this.modelAnimations[key] = animationController;
             }
             // show animations in console
-            console.log(`Model ${modelId} clone:`, modelClone);
+            console.log(`Model ${modelId} ${key} clone:`, modelClone);
         }
         this.trackedModels[key] = true;
         return this.scene.getObjectById(this.modelIds[key]);

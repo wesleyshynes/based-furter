@@ -7,6 +7,7 @@ export const playerData = {
     radius: 0.5,
     speed: 5,
     collisionRadius: 0.5,
+    collisionDamage: 1,
     invincibilityDuration: 2, // seconds
 
     model: Low_Poly_Person_Animated,

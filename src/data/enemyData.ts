@@ -17,7 +17,7 @@ export const enemyData: {
         radius: 0.8,
         collisionRadius: 0.8,
         speed: 3,
-        health: 1,
+        health: 100,
         damage: 1,
         behaviorType: 'seek',
 

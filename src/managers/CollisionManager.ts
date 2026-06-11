@@ -22,17 +22,24 @@ export class CollisionManager {
         for (const enemy of enemies) {
             if (this.collisionSystem.checkCircleCircleZ(player, enemy)) {
                 if (!enemy.active) continue; // Skip if enemy is already inactive
-                enemy.active = false;
-                const damageDealt = enemy.damage; // You can adjust this value or make it depend on the enemy type
-                const damageApplied = player.takeDamage(damageDealt);
-                if (damageApplied) {
+                
+                const enemyDamageApplied = enemy.takeDamage(player.collisionDamage);
+                if (enemyDamageApplied) {
+                    this.events.emit(EVENTS.ENEMY_DAMAGED, enemy);
+                    if (enemy.isDead()) {
+                        enemy.active = false;
+                        this.events.emit(EVENTS.ENEMY_DIED, enemy);
+                    }
+                }
+
+                const playerDamageApplied = player.takeDamage(enemy.damage);
+                if (playerDamageApplied) {
                     this.events.emit(EVENTS.PLAYER_DAMAGED, player.health, player.maxHealth);
                     if (player.isDead()) {
                         this.events.emit(EVENTS.PLAYER_DIED);
                         return; // No need to check further if player is dead
                     }
                 }
-                this.events.emit(EVENTS.ENEMY_DIED, enemy);
             }
         }
     }
