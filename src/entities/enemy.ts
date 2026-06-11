@@ -23,7 +23,7 @@ export class Enemy {
     invincible: boolean;
     invincibilityTimer: number;
 
-    private data: EnemyDataType;
+    data: EnemyDataType;
     private behavior: BehaviorType;
     type: string
 

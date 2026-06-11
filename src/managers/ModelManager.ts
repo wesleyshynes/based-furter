@@ -142,6 +142,33 @@ export class ModelManager {
         }
     }
 
+    loadHealthBar(name: string, width: number, height: number, emptyColor: number, fillColor: number, borderColor: number) {
+        const geometry = new THREE.PlaneGeometry(width, height);
+        const material = new THREE.MeshBasicMaterial({ color: emptyColor, side: THREE.DoubleSide });
+        const model = new THREE.Mesh(geometry, material);
+        model.position.set(0, 0, 0);
+        model.castShadow = false;
+
+        const fillGeometry = new THREE.PlaneGeometry(width, height);
+        const fillMaterial = new THREE.MeshBasicMaterial({ color: fillColor, side: THREE.DoubleSide });
+        const fillMesh = new THREE.Mesh(fillGeometry, fillMaterial);
+        fillMesh.position.set(0, 0, 0.01); // Slightly in front of the empty bar
+        model.add(fillMesh);
+
+        // Add a border using LineSegments
+        const borderGeometry = new THREE.EdgesGeometry(geometry);
+        const borderMaterial = new THREE.LineBasicMaterial({ color: borderColor });
+        const borderMesh = new THREE.LineSegments(borderGeometry, borderMaterial);
+        model.add(borderMesh);
+
+        this.models[name] = {
+            model: model,
+            animations: [],
+            loaded: true,
+            error: null,
+        }
+    }
+
     get(name: string) {
         return this.models[name] || null;
         // return this.models[name]?.model || null;
@@ -174,5 +201,9 @@ export class ModelManager {
             }
         }));
         spheresToLoad.forEach(({ name, radius, color }) => this.loadSphere(name, radius, color));
+
+        // Load health bar model
+        // black bg and red fill and white border for now, can be replaced with a texture later
+        this.loadHealthBar('healthBar', 1, 0.2, 0x000000, 0xff0000, 0xffffff);
     }
 }

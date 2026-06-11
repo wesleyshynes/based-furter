@@ -6,7 +6,7 @@ export const enemyData: {
         radius: 0.5,
         collisionRadius: 0.5,
         speed: 2,
-        health: 1,
+        health: 5,
         damage: 1,
         behaviorType: 'drift',
 
@@ -17,8 +17,8 @@ export const enemyData: {
         radius: 0.8,
         collisionRadius: 0.8,
         speed: 3,
-        health: 100,
-        damage: 1,
+        health: 3,
+        damage: 2,
         behaviorType: 'seek',
 
         color: 0xffff00,

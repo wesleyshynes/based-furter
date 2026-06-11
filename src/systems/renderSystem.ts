@@ -10,12 +10,7 @@ const FLASH_MIN_ALPHA = 0.3;
 const FLASH_ALPHA_RANGE = 0.7;
 const FLASH_SPEED = 10;
 
-const HEALTH_BAR_HEIGHT = 0.2;
-const HEALTH_BAR_OFFSET = 0.5;
-
-const HEALTH_BAR_BG = 'rgba(0, 0, 0, 0.6)';
-const HEALTH_BAR_FILL = 'rgba(255, 0, 0, 0.6)';
-
+const HEALTH_BAR_OFFSET = 1;
 export class RenderSystem {
     private canvas: HTMLDivElement;
     private renderer: THREE.WebGLRenderer;
@@ -159,7 +154,6 @@ export class RenderSystem {
             const enemyModel = this.keyedModel(enemyId, `enemy_${enemy.type}`);
 
             if (enemy.invincible) {
-                console.log(`Enemy ${enemyId} is invincible with timer: ${enemy.invincibilityTimer}`);
                 // make the enemy slightly transparent when invincible
                 const transparencyValue = FLASH_MIN_ALPHA + FLASH_ALPHA_RANGE * Math.abs(Math.sin(enemy.invincibilityTimer * FLASH_SPEED)); // oscillate between 0.3 and 1
                 this.setModelTransparency(enemyModel!, true, transparencyValue);
@@ -177,7 +171,24 @@ export class RenderSystem {
             if (enemyModel) {
                 enemyModel.rotation.y += (enemy.angle - enemyModel.rotation.y) * 0.1;
             }
+
+            if (enemy.health < enemy.data.health) {
+                this.renderEnemyHealthBar(enemy, enemyId);
+            }
         }
+    }
+
+    renderEnemyHealthBar(enemy: Enemy, enemyKey: string) {
+        const healthBar = this.keyedModel(`healthBar_${enemyKey}`, 'healthBar');
+        if (healthBar) {
+            const fillMesh = healthBar.children[0] as THREE.Mesh;
+            const fillScale = enemy.health / enemy.data.health;
+            // fill from left to right
+            fillMesh.scale.set(fillScale, 1, 1);
+            fillMesh.position.set(-0.5 * (1 - fillScale), 0, 0.01); // Adjust position to keep left edge anchored
+        }
+        healthBar?.position.set(enemy.x, enemy.radius + HEALTH_BAR_OFFSET, enemy.z);
+        // healthBar?.lookAt(this.camera.position);
     }
 
     keyedModel(key: string, modelId: string) {
@@ -188,6 +199,17 @@ export class RenderSystem {
             console.log(`Model ${modelId} loaded:`, model);
             const modelClone = model ? skeletonClone(model) : null;
             if (modelClone) {
+                // Clone materials so each instance has independent material state
+                modelClone.traverse((child) => {
+                    if ((child as THREE.Mesh).isMesh) {
+                        const mesh = child as THREE.Mesh;
+                        if (Array.isArray(mesh.material)) {
+                            mesh.material = mesh.material.map(mat => mat.clone());
+                        } else if (mesh.material) {
+                            mesh.material = (mesh.material as THREE.Material).clone();
+                        }
+                    }
+                });
                 this.addToScene(modelClone);
                 this.modelIds[key] = modelClone.id;
                 this.modelState[key] = {};
