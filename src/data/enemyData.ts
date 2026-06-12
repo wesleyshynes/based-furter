@@ -9,6 +9,8 @@ export const enemyData: {
         health: 5,
         damage: 1,
         behaviorType: 'drift',
+        pushbackForce: 0,
+        pushbackImmune: true,
 
         color: 0xff0000,
     },
@@ -20,6 +22,8 @@ export const enemyData: {
         health: 3,
         damage: 2,
         behaviorType: 'seek',
+        pushbackForce: 120,
+        pushbackImmune: false,
 
         color: 0xffff00,
         // model: Wolf,
@@ -37,6 +41,8 @@ export interface EnemyDataType {
     health: number;
     damage: number;
     behaviorType: string;
+    pushbackForce: number;
+    pushbackImmune: boolean;
     
     color: number;
     model?: any;

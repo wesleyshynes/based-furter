@@ -20,15 +20,22 @@ export class CollisionManager {
 
     checkPlayerVsEnemies(player: Player, enemies: Enemy[]) {
         for (const enemy of enemies) {
+            if (!enemy.active) continue; // Skip if enemy is already inactive
             if (this.collisionSystem.checkCircleCircleZ(player, enemy)) {
-                if (!enemy.active) continue; // Skip if enemy is already inactive
-                
+                const dx = player.x - enemy.x;
+                const dz = player.z - enemy.z;
+                const distance = Math.sqrt(dx * dx + dz * dz);
+                const nx = dx > 0 ? dx / distance : 1;
+                const nz = dz > 0 ? dz / distance : 0;
+
                 const enemyDamageApplied = enemy.takeDamage(player.collisionDamage);
                 if (enemyDamageApplied) {
                     this.events.emit(EVENTS.ENEMY_DAMAGED, enemy);
                     if (enemy.isDead()) {
                         enemy.active = false;
                         this.events.emit(EVENTS.ENEMY_DIED, enemy);
+                    } else if (!enemy.data.pushbackImmune) {
+                        enemy.applyPushback(-nx, -nz, enemy.data.pushbackForce);
                     }
                 }
 
@@ -39,6 +46,9 @@ export class CollisionManager {
                         this.events.emit(EVENTS.PLAYER_DIED);
                         return; // No need to check further if player is dead
                     }
+                }
+                if (enemy.data.pushbackImmune) {
+                    player.applyPushback(nx, nz, player.pushbackForce);
                 }
             }
         }

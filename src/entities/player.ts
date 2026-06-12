@@ -1,4 +1,4 @@
-import { GRID_SIZE, PLAYER_START_COORDS } from '../core/constants';
+import { GRID_SIZE, PLAYER_START_COORDS, PUSHBACK_DECAY } from '../core/constants';
 import { playerData } from '../data/playerData';
 export class Player {
 
@@ -24,6 +24,10 @@ export class Player {
 
     angle: number;
 
+    pushbackForce: number;
+    pushVx: number;
+    pushVz: number;
+
     constructor() {
         this.x = PLAYER_START_COORDS.x;
         this.y = PLAYER_START_COORDS.y;
@@ -44,6 +48,10 @@ export class Player {
         this.speed = playerData.speed;
         this.moving = false;
         this.angle = 0;
+
+        this.pushbackForce = playerData.pushbackForce;
+        this.pushVx = 0;
+        this.pushVz = 0;
     }
 
     reset() {
@@ -55,6 +63,8 @@ export class Player {
         this.invincibilityTimer = 0;
         this.angle = 0;
         this.redMode = false;
+        this.pushVx = 0;
+        this.pushVz = 0;
     }
 
     update(dt: number, input: {
@@ -70,6 +80,22 @@ export class Player {
             if (this.invincibilityTimer <= 0) {
                 this.invincible = false;
                 this.invincibilityTimer = 0;
+            }
+        }
+
+        if (this.pushVx !== 0 || this.pushVz !== 0) {
+            this.x += this.pushVx * dt;
+            this.z += this.pushVz * dt;
+
+            const speed = Math.sqrt(this.pushVx * this.pushVx + this.pushVz * this.pushVz);
+            const decay = PUSHBACK_DECAY * dt;
+            if (speed <= decay) {
+                this.pushVx = 0;
+                this.pushVz = 0;
+            } else {
+                const ratio = (speed - decay) / speed;
+                this.pushVx *= ratio;
+                this.pushVz *= ratio;
             }
         }
 
@@ -122,6 +148,11 @@ export class Player {
         // keep player in bounds of the grid
         this.x = Math.max(-GRID_SIZE / 2 + this.radius, Math.min(GRID_SIZE / 2 - this.radius, this.x));
         this.z = Math.max(-GRID_SIZE / 2 + this.radius, Math.min(GRID_SIZE / 2 - this.radius, this.z));
+    }
+
+    applyPushback(dirX: number, dirZ: number, force: number) {
+        this.pushVx = dirX * force;
+        this.pushVz = dirZ * force;
     }
 
     takeDamage(amount: number) {

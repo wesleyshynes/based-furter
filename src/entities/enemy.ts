@@ -1,4 +1,4 @@
-import { ENEMY_DESPAWN_DISTANCE, ENEMY_HIT_INVINCIBILITY_DURATION } from "../core/constants";
+import { ENEMY_DESPAWN_DISTANCE, ENEMY_HIT_INVINCIBILITY_DURATION, PUSHBACK_DECAY } from "../core/constants";
 import type { EnemyDataType } from "../data/enemyData";
 import type { BehaviorType } from "./behaviors/behaviorType";
 
@@ -22,6 +22,9 @@ export class Enemy {
     active: boolean;
     invincible: boolean;
     invincibilityTimer: number;
+
+    pushVx: number;
+    pushVz: number;
 
     data: EnemyDataType;
     private behavior: BehaviorType;
@@ -49,6 +52,9 @@ export class Enemy {
         this.active = false;
         this.invincible = false;
         this.invincibilityTimer = 0;
+
+        this.pushVx = 0;
+        this.pushVz = 0;
     }
 
     spawn(x: number, z: number) {
@@ -61,6 +67,8 @@ export class Enemy {
     reset() {
         this.health = this.data.health;
         this.active = false;
+        this.pushVx = 0;
+        this.pushVz = 0;
         this.behavior.reset();
     }
 
@@ -79,6 +87,23 @@ export class Enemy {
         const dz = player.z - this.z;
         const len = Math.sqrt(dx * dx + dz * dz);
 
+        // apply pushback velocity and decay
+        if (this.pushVx !== 0 || this.pushVz !== 0) {
+            this.x += this.pushVx * dt;
+            this.z += this.pushVz * dt;
+
+            const speed = Math.sqrt(this.pushVx * this.pushVx + this.pushVz * this.pushVz);
+            const decay = PUSHBACK_DECAY * dt;
+            if (speed <= decay) {
+                this.pushVx = 0;
+                this.pushVz = 0;
+            } else {
+                const ratio = (speed - decay) / speed;
+                this.pushVx *= ratio;
+                this.pushVz *= ratio;
+            }
+        }
+
         // despawn if too far from player
         if (len > ENEMY_DESPAWN_DISTANCE) {
             this.active = false;
@@ -86,6 +111,11 @@ export class Enemy {
         }
 
         this.behavior.update(this, dt, player);
+    }
+
+    applyPushback(dirX: number, dirZ: number, force: number) {
+        this.pushVx = dirX * force;
+        this.pushVz = dirZ * force;
     }
 
     takeDamage(amount: number) {

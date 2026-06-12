@@ -21,6 +21,7 @@ export const ENEMY_DESPAWN_DISTANCE = 50;
 export const ENEMY_SPAWN_DISTANCE = 30;
 export const ENEMY_SPAWN_INTERVAL = 2;
 export const ENEMY_HIT_INVINCIBILITY_DURATION = 1.5;
+export const PUSHBACK_DECAY = 800;
 
 export const EVENTS = {
     // Audio

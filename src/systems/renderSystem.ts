@@ -150,6 +150,7 @@ export class RenderSystem {
     renderEnemies(enemies: Enemy[]) {
         for (let i = 0; i < enemies.length; i++) {
             const enemy = enemies[i];
+            if (!enemy.active) continue; // Skip rendering if enemy is not active
             const enemyId = `enemy_${enemy.type}_${enemy.id}`;
             const enemyModel = this.keyedModel(enemyId, `enemy_${enemy.type}`);
 
