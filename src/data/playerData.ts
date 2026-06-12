@@ -4,9 +4,9 @@ import Low_Poly_Person_Animated from '../assets/models/glb/low-poly-person-anima
 
 export const playerData = {
     maxHealth: 12,
-    radius: 0.5,
     speed: 5,
-    collisionRadius: 0.5,
+    radius: 1,
+    collisionRadius: 1,
     collisionDamage: 1,
     invincibilityDuration: 2, // seconds
     pushbackForce: 120,
