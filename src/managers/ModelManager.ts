@@ -142,6 +142,21 @@ export class ModelManager {
         }
     }
 
+    loadDebugSphere(name: string, radius: number, color: number) {
+        const geometry = new THREE.SphereGeometry(radius, 16, 16);
+        const material = new THREE.MeshBasicMaterial({ color: color, wireframe: true });
+        const model = new THREE.Mesh(geometry, material);
+        model.position.set(0, radius, 0);
+        model.castShadow = false;
+
+        this.models[name] = {
+            model: model,
+            animations: [],
+            loaded: true,
+            error: null,
+        }
+    }
+
     loadHealthBar(name: string, width: number, height: number, emptyColor: number, fillColor: number, borderColor: number) {
         const geometry = new THREE.PlaneGeometry(width, height);
         const material = new THREE.MeshBasicMaterial({ color: emptyColor, side: THREE.DoubleSide });
@@ -184,6 +199,10 @@ export class ModelManager {
         ]
         const spheresToLoad: { name: string; radius: number; color: number }[] = []
 
+        const debugSpheresToLoad: { name: string; radius: number; color: number }[] = [
+            { name: 'player_collision', radius: playerData.collisionRadius, color: 0x00ff00 }
+        ];
+
         Object.keys(enemyData).forEach(type => {
             if (enemyData[type].model) {
                 const options = enemyData[type].modelOptions || { scale: 1 };
@@ -191,6 +210,8 @@ export class ModelManager {
             } else {
                 spheresToLoad.push({ name: `enemy_${type}`, radius: enemyData[type].radius, color: enemyData[type].color });
             }
+            // add debug spheres for enemy collision radius
+            debugSpheresToLoad.push({ name: `enemy_${type}_collision`, radius: enemyData[type].collisionRadius, color: 0xff0000 });
         });
 
         await Promise.all(modelsToLoad.map(({ name, url, options }) => {
@@ -201,6 +222,8 @@ export class ModelManager {
             }
         }));
         spheresToLoad.forEach(({ name, radius, color }) => this.loadSphere(name, radius, color));
+
+        debugSpheresToLoad.forEach(({ name, radius, color }) => this.loadDebugSphere(name, radius, color));
 
         // Load health bar model
         // black bg and red fill and white border for now, can be replaced with a texture later

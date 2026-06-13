@@ -24,6 +24,8 @@ export const ENEMY_HIT_INVINCIBILITY_DURATION = 1.5;
 export const PUSHBACK_DECAY = 800;
 
 export const EVENTS = {
+    // DEBUG
+    TOGGLE_DEBUG: 'toggleDebug',
     // Audio
     SOUND: 'sound',
     // Game State

@@ -1,9 +1,25 @@
+import { EVENTS } from '../core/constants';
+import type { EventEmitter } from '../core/eventEmitter';
 import { audioData } from '../data/audioData';
 
 export class AudioManager {
     private sounds: { [key: string]: any };
-    constructor() {
+    constructor(events: EventEmitter) {
         this.sounds = {};
+        this._registerEvents(events);
+    }
+
+    _registerEvents(events: EventEmitter) {
+        events.on(EVENTS.SOUND, (name: string) => {
+            this.play(name);
+        });
+        // play enemy sounds
+        events.on(EVENTS.ENEMY_DAMAGED, (enemy: any) => {
+            this.play(enemy.data.sounds?.hit);
+        });
+        events.on(EVENTS.ENEMY_DIED, (enemy: any) => {
+            this.play(enemy.data.sounds?.death);
+        });
     }
 
     load(name: string, path: string) {
@@ -28,6 +44,9 @@ export class AudioManager {
     }
 
     play(name: string) {
+        if (!name) {
+            return;
+        }
         const sound = this.sounds[name]?.loaded ? this.sounds[name] : null;
         if (sound) {
             sound.audio.currentTime = 0; // reset to start

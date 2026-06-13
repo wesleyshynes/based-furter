@@ -13,6 +13,10 @@ export const enemyData: {
         pushbackImmune: true,
 
         color: 0xff0000,
+        sounds: {
+            hit: 'enemy_drifter_hit',
+            death: 'enemy_drifter_death',
+        }
     },
     seeker: {
         type: 'seeker',
@@ -22,7 +26,7 @@ export const enemyData: {
         health: 3,
         damage: 2,
         behaviorType: 'seek',
-        pushbackForce: 120,
+        pushbackForce: 80,
         pushbackImmune: false,
 
         color: 0xffff00,
@@ -30,6 +34,11 @@ export const enemyData: {
         // modelOptions: {
         //     scale: 3,
         // }
+
+        sounds: {
+            hit: 'enemy_seeker_hit',
+            death: 'enemy_seeker_death',
+        }
     }
 }
 
@@ -43,7 +52,10 @@ export interface EnemyDataType {
     behaviorType: string;
     pushbackForce: number;
     pushbackImmune: boolean;
-    
+    sounds: {
+        hit: string;
+        death: string;
+    };
     color: number;
     model?: any;
     modelOptions?: {

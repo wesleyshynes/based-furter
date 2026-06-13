@@ -17,6 +17,8 @@ import { missionData } from '../data/playerData';
 export class Game {
     private canvas: HTMLDivElement;
 
+    private debug: boolean;
+
     private events: EventEmitter;
     private modelManager: ModelManager;
     public audioManager: AudioManager;
@@ -46,13 +48,15 @@ export class Game {
 
     constructor() {
 
+        this.debug = false;
+
         this.state = GAME_STATES.MENU;
         this.canvas = document.getElementById('threeCanvasContainer') as HTMLDivElement;
 
         this.events = new EventEmitter();
 
         this.modelManager = new ModelManager();
-        this.audioManager = new AudioManager();
+        this.audioManager = new AudioManager(this.events);
         this.uiManager = new UIManager(this.events);
         this.enemyManager = new EnemyManager();
         this.enemySpawner = new EnemySpawner(this.enemyManager);
@@ -96,6 +100,10 @@ export class Game {
                     this.resume();
                 }
             }
+            // toggle debug with `
+            if (event.key === '`') {
+                this.debug = !this.debug;
+            }
         });
 
         this.lastTime = 0;
@@ -114,11 +122,6 @@ export class Game {
             this.modelManager.loadAll(),
             this.audioManager.loadAll(),
         ]);
-
-        // Sound Events
-        this.events.on(EVENTS.SOUND, (name: string) => {
-            this.audioManager.play(name);
-        });
 
         // Game State Events
         this.events.on(EVENTS.GAME_START, () => {
@@ -151,14 +154,12 @@ export class Game {
         this.events.on(EVENTS.ENEMY_DIED, () => {
             this.enemiesKilled++;
             this.events.emit(EVENTS.ENEMY_KILLED_COUNT, this.enemiesKilled);
-            this.checkMissionConditions();
         });
 
         this.uiManager.showPanel('mainMenu');
 
         this.resizeCanvas();
         window.addEventListener('resize', () => { this.resizeCanvas() });
-        this.inputManager.initialize();
         this.uiManager.setupEventListeners();
 
         requestAnimationFrame((t) => this.gameLoop(t));
@@ -238,7 +239,7 @@ export class Game {
 
         const activeEnemies = this.enemyManager.getActiveEnemies();
         this.update(dt, activeEnemies);
-        this.renderSystem.render(dt, this.state, this.player, activeEnemies);
+        this.renderSystem.render(dt, this.state, this.player, activeEnemies, this.debug);
 
         requestAnimationFrame((t) => this.gameLoop(t));
     }
@@ -253,9 +254,9 @@ export class Game {
         this.cube.rotation.y += 1 * dt;
 
         this.player.update(dt, this.inputManager.getInputState());
+        this.collisionManager.update(this.player, activeEnemies);
         this.enemyManager.update(dt, this.player);
         this.enemySpawner.update(dt);
-        this.collisionManager.update(this.player, activeEnemies);
     }
 
     checkMissionConditions() {

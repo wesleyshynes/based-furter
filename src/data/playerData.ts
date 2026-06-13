@@ -9,7 +9,7 @@ export const playerData = {
     collisionRadius: 1,
     collisionDamage: 1,
     invincibilityDuration: 2, // seconds
-    pushbackForce: 120,
+    pushbackForce: 60,
 
     model: Low_Poly_Person_Animated,
     // model: Low_Poly_Person,

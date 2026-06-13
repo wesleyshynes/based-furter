@@ -197,7 +197,7 @@ export class RenderSystem {
             const modelInfo = this.modelManager.get(modelId);
             const model = modelInfo?.model || null;
             // show model animations
-            console.log(`Model ${modelId} loaded:`, model);
+            // console.log(`Model ${modelId} loaded:`, model);
             const modelClone = model ? skeletonClone(model) : null;
             if (modelClone) {
                 // Clone materials so each instance has independent material state
@@ -223,7 +223,7 @@ export class RenderSystem {
                 this.modelAnimations[key] = animationController;
             }
             // show animations in console
-            console.log(`Model ${modelId} ${key} clone:`, modelClone);
+            // console.log(`Model ${modelId} ${key} clone:`, modelClone);
         }
         this.trackedModels[key] = true;
         return this.scene.getObjectById(this.modelIds[key]);
@@ -241,7 +241,21 @@ export class RenderSystem {
         delete this.modelAnimations[key];
     }
 
-    render(dt: number, state: string, player: Player, enemies: Enemy[] = []) {
+    renderDebugOverlay(player: Player, enemies: Enemy[]) {
+        const playerCollision = this.keyedModel('player_collision', 'player_collision');
+        if (playerCollision) {
+            playerCollision.position.set(player.x, player.y, player.z);
+        }
+
+        enemies.forEach(enemy => {
+            const enemyCollision = this.keyedModel(`enemy_${enemy.type}_collision_${enemy.id}`, `enemy_${enemy.type}_collision`);
+            if (enemyCollision) {
+                enemyCollision.position.set(enemy.x, enemy.y, enemy.z);
+            }
+        });
+    }
+
+    render(dt: number, state: string, player: Player, enemies: Enemy[] = [], debug: boolean = false) {
 
         if (state !== GAME_STATES.PLAYING) {
             this.renderer.render(this.pauseScene, this.camera);
@@ -262,6 +276,10 @@ export class RenderSystem {
             this.camera.lookAt(0, 0, 8);
 
             this.renderer.render(this.scene, this.camera);
+
+            if (debug) {
+                this.renderDebugOverlay(player, enemies);
+            }
         }
 
     }

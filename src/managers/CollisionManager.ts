@@ -25,8 +25,8 @@ export class CollisionManager {
                 const dx = player.x - enemy.x;
                 const dz = player.z - enemy.z;
                 const distance = Math.sqrt(dx * dx + dz * dz);
-                const nx = dx > 0 ? dx / distance : 1;
-                const nz = dz > 0 ? dz / distance : 0;
+                const nx = distance > 0 ? dx / distance : 1;
+                const nz = distance > 0 ? dz / distance : 0;
 
                 const enemyDamageApplied = enemy.takeDamage(player.collisionDamage);
                 if (enemyDamageApplied) {
@@ -46,9 +46,9 @@ export class CollisionManager {
                         this.events.emit(EVENTS.PLAYER_DIED);
                         return; // No need to check further if player is dead
                     }
-                }
-                if (enemy.data.pushbackImmune) {
-                    player.applyPushback(nx, nz, player.pushbackForce);
+                    if (enemy.data.pushbackImmune) {
+                        player.applyPushback(nx, nz, player.pushbackForce);
+                    }
                 }
             }
         }

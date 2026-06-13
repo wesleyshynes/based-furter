@@ -1,5 +1,4 @@
 import nipplejs from 'nipplejs';
-
 export class InputManager {
 
     private keys: { [key: string]: boolean };
@@ -28,7 +27,7 @@ export class InputManager {
         })
 
         this.actionButtonElement = actionButtonElement;
-
+        this.initialize();
     }
 
     initialize() {
@@ -39,16 +38,7 @@ export class InputManager {
     setupKeyboard() {
         window.addEventListener('keydown', (event) => {
             this.keys[event.key.toLowerCase()] = true;
-
             this.onKeyDown(event);
-
-            // if (event.key === 'Escape') {
-            //     if (this.state === GAME_STATES.PLAYING) {
-            //         this.pause();
-            //     } else if (this.state === GAME_STATES.PAUSED) {
-            //         this.resume();
-            //     }
-            // }
         });
         window.addEventListener('keyup', (event) => {
             this.keys[event.key.toLowerCase()] = false;
