@@ -63,19 +63,17 @@ export class RenderSystem {
         this.renderer.setSize(width, height);
     }
 
-    setModelTransparency(model: THREE.Object3D, transparent: boolean, opacity: number = 1) {
+    setModelTransparency(model: THREE.Object3D, _transparent: boolean, opacity: number = 1) {
+        // Keep transparent=true at all times (set during material clone) to avoid
+        // shader recompilation on the first hit. Only vary opacity.
         model.traverse((child: any) => {
             if ((child as THREE.Mesh).isMesh) {
                 const mesh = child as THREE.Mesh;
                 if (mesh.material instanceof THREE.Material) {
-                    mesh.material.transparent = transparent;
                     mesh.material.opacity = opacity;
-                    mesh.material.needsUpdate = true; // ensure material updates
                 } else if (Array.isArray(mesh.material)) {
                     mesh.material.forEach((mat) => {
-                        mat.transparent = transparent;
                         mat.opacity = opacity;
-                        mat.needsUpdate = true; // ensure material updates
                     });
                 }
             }
@@ -205,9 +203,19 @@ export class RenderSystem {
                     if ((child as THREE.Mesh).isMesh) {
                         const mesh = child as THREE.Mesh;
                         if (Array.isArray(mesh.material)) {
-                            mesh.material = mesh.material.map(mat => mat.clone());
+                            mesh.material = mesh.material.map(mat => {
+                                const cloned = mat.clone();
+                                // Pre-warm the transparent shader variant so the first hit
+                                // doesn't trigger a GPU shader recompile (causing stutter).
+                                cloned.transparent = true;
+                                cloned.opacity = 1;
+                                return cloned;
+                            });
                         } else if (mesh.material) {
-                            mesh.material = (mesh.material as THREE.Material).clone();
+                            const cloned = (mesh.material as THREE.Material).clone();
+                            cloned.transparent = true;
+                            cloned.opacity = 1;
+                            mesh.material = cloned;
                         }
                     }
                 });
